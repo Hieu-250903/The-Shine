@@ -1,0 +1,34 @@
+@import "tailwindcss";
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.clip-diagonal {
+  clip-path: polygon(41% 0, 100% 0, 100% 100%, 21% 100%, 0 53%);
+}
+.clip-path-rhom {
+  clip-path: polygon(49% 0, 88% 49%, 50% 100%, 16% 50%);
+}
+.clip-trapezoid {
+  clip-path: polygon(20% 58%, 76% 58%, 100% 100%, 0% 100%);
+}
+.clip-round-45 {
+  clip-path: polygon(100% 0, 46% 0, 100% 65%);
+}
+.clip-future-end {
+  clip-path: polygon(0 1%, 0% 100%, 100% 100%);
+}
+.overlay-black-to-transparent {
+  @apply absolute top-0 right-0 w-full h-full pointer-events-none;
+  background: linear-gradient(
+    to left,
+    #000000 200px,
+    #000000 0%,
+    rgba(255, 255, 255, 0.1) 500px,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  opacity: 0.5;
+}
