@@ -1,14 +1,23 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import registerImageBg1 from "../../../assets/iamges/registerImageBg1.jpg";
 import registerImageBg2 from "../../../assets/iamges/registerImageBg2.jpg";
-import { GoogleOutlined } from "@ant-design/icons";
+import {
+  GoogleOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+} from "@ant-design/icons";
+import { registerApi } from "../../../services/auth";
+import { message, App } from "antd";
+
 const registerSchema = z
   .object({
     fullName: z.string().min(1, "Vui lòng nhập họ và tên"),
-    phoneOrEmail: z.string().min(1, "Vui lòng nhập số điện thoại hoặc email"),
+    email: z.string().email("Vui lòng nhập email hợp lệ"),
+    phoneNumber: z.string().min(1, "Vui lòng nhập số điện thoại"),
     password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
     confirmPassword: z
       .string()
@@ -24,19 +33,64 @@ const registerSchema = z
 
 export default function Register() {
   const navigator = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      agree: false,
+    },
   });
 
-  const onSubmit = (data) => {
-    console.log("Dữ liệu đăng ký:", data);
-    navigator("/login");
-  };
+  const onSubmit = async (data) => {
+    try {
+      const apiData = {
+        email: data.email,
+        fullName: data.fullName,
+        phoneNumber: data.phoneNumber,
+        password: data.password,
+      };
 
+      const res = await registerApi(apiData);
+      if (res && res.isSucceed) {
+        if (
+          res.messages &&
+          res.messages.Message &&
+          res.messages.Message.length > 0
+        ) {
+          message.success(res.messages.Message[0]);
+        } else {
+          message.success("Đăng ký thành công");
+        }
+        navigator("/login");
+      } else {
+        if (res && res.messages) {
+          const errorMessages = [];
+          Object.keys(res.messages).forEach((key) => {
+            if (res.messages[key] && Array.isArray(res.messages[key])) {
+              errorMessages.push(...res.messages[key]);
+            }
+          });
+
+          if (errorMessages.length > 0) {
+            message.error(errorMessages[0]);
+          } else {
+            message.error("Đăng ký thất bại. Vui lòng thử lại.");
+          }
+        } else {
+          message.error("Đăng ký thất bại. Vui lòng thử lại.");
+        }
+      }
+    } catch (error) {
+      message.error("Có lỗi xảy ra. Vui lòng thử lại sau.");
+    }
+  };
   return (
     <div className="relative">
       <Link
@@ -87,25 +141,44 @@ export default function Register() {
 
             <div>
               <input
-                type="text"
-                {...register("phoneOrEmail")}
-                placeholder="Nhập số điện thoại / Email"
+                type="email"
+                {...register("email")}
+                placeholder="Nhập email"
                 className="w-full border-b py-2 outline-none placeholder-gray-500"
               />
-              {errors.phoneOrEmail && (
-                <p className="text-red-500 text-xs">
-                  {errors.phoneOrEmail.message}
-                </p>
+              {errors.email && (
+                <p className="text-red-500 text-xs">{errors.email.message}</p>
               )}
             </div>
 
             <div>
               <input
-                type="password"
-                {...register("password")}
-                placeholder="Nhập mật khẩu"
+                type="tel"
+                {...register("phoneNumber")}
+                placeholder="Nhập số điện thoại"
                 className="w-full border-b py-2 outline-none placeholder-gray-500"
               />
+              {errors.phoneNumber && (
+                <p className="text-red-500 text-xs">
+                  {errors.phoneNumber.message}
+                </p>
+              )}
+            </div>
+
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                {...register("password")}
+                placeholder="Nhập mật khẩu"
+                className="w-full border-b py-2 pr-8 outline-none placeholder-gray-500"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-0 top-2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+              </button>
               {errors.password && (
                 <p className="text-red-500 text-xs">
                   {errors.password.message}
@@ -113,13 +186,24 @@ export default function Register() {
               )}
             </div>
 
-            <div>
+            <div className="relative">
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 {...register("confirmPassword")}
                 placeholder="Xác nhận mật khẩu"
-                className="w-full border-b py-2 outline-none placeholder-gray-500"
+                className="w-full border-b py-2 pr-8 outline-none placeholder-gray-500"
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-0 top-2 text-gray-500 hover:text-gray-700"
+              >
+                {showConfirmPassword ? (
+                  <EyeInvisibleOutlined />
+                ) : (
+                  <EyeOutlined />
+                )}
+              </button>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-xs">
                   {errors.confirmPassword.message}
@@ -128,7 +212,18 @@ export default function Register() {
             </div>
 
             <div className="flex items-start gap-2">
-              <input type="checkbox" {...register("agree")} className="mt-1" />
+              <Controller
+                name="agree"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="checkbox"
+                    checked={field.value}
+                    onChange={field.onChange}
+                    className="mt-1"
+                  />
+                )}
+              />
               <span className="text-xs text-gray-600">
                 Tôi đồng ý với Điều khoản dịch vụ của THE SHINE
               </span>

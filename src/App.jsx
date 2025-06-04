@@ -23,6 +23,10 @@ import RecruiterCreatePost from "./pages/RecruiterCreatePost/RecruiterCreatePost
 import ServicePackages from "./pages/ServicePackages/ServicePackages";
 import PaymentPackage from "./pages/PaymentPackage/PaymentPackage";
 import CandidateInfo from "./pages/CandidateInfo/CandidateInfo";
+import { message } from "antd";
+import ConfirmEmail from "./pages/Auth/ConfirmEmail/ConfirmEmail";
+import ForgotPassword from "./pages/Auth/ForgotPassword/ForgotPassword";
+import ResetPassword from "./pages/Auth/ResetPassword/ResetPassword";
 
 const App = () => {
   const router = createBrowserRouter(
@@ -30,6 +34,10 @@ const App = () => {
       <Route path="/">
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/confirm-email" element={<ConfirmEmail />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        
         <Route path="/role-selection" element={<RoleSelection />} />
 
         <Route element={<RootLayout />}>

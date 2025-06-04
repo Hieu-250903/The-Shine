@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { Button, Checkbox } from "antd";
-import { GoogleOutlined, CloseOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
+import { CloseOutlined, GoogleOutlined } from "@ant-design/icons";
+import { Button, Checkbox, message } from "antd";
+import Cookie from "js-cookie";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
-
+import loginBg from "../../../assets/iamges/loginBg.jpg";
+import { loginApi } from "../../../services/auth";
 const loginSchema = z.object({
   email: z.string().email({ message: "Email không hợp lệ" }),
   password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
@@ -27,17 +29,20 @@ const LoginScreen = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     try {
       loginSchema.parse(formData);
-      // Nếu xác thực thành công, chuyển đến màn hình lựa chọn vai trò
-      navigate("/role-selection");
+      const res = await loginApi(formData);
+      if (res.isSucceed) {
+        message.success("Đăng nhập thành công");
+        Cookie.set("accessToken", res.data.accessToken);
+        Cookie.set("refreshToken", res.data.refreshToken);
+        navigate("/role-selection");
+      } else {
+        message.error("Thông tin tài khoản và mật khẩu không chính xác");
+      }
     } catch (error) {
-      const formattedErrors = {};
-      error.errors.forEach((err) => {
-        formattedErrors[err.path[0]] = err.message;
-      });
-      setErrors(formattedErrors);
+      message.error("Thông tin tài khoản và mật khẩu không chính xác");
     }
   };
 
@@ -55,8 +60,7 @@ const LoginScreen = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url('https://s3-alpha-sig.figma.com/img/d781/5d1a/85ad0c4a17a4637c2981b5bd52865fa2?Expires=1746403200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=RC2B0z7jQN43GmArqkYpgTLq5vePayi8eLgZ2Rn6MiRZ~KWX5KGMxGSuLjdc-aqCa4wfTE1PHNTZ0sGA-hD1ogsMiIdGOSWJnbDwmF7cxJXPvi5jLK5BMjh9sSeGy4SnT5pNXMpoPViNv8ifdZ31z9kvDNZ3eYxlW5zvNC8BjNspcb4z7aSN0dGprDdymQwY0Xk89djm07KMgrtK334RgSpo4bUfCoDfSv4C5uuc~phnFO~-w4GCGJTTxjoA78EAQo5onD5Cg2h74GZJv-0q-17QDyQBzuUOt6MDbAq-XNtzSHY~4zlWmvBpHanAB3o7hEjYSrFvD~GpJXEsm3WYfw__')",
+            backgroundImage: `url(${loginBg})`,
             backgroundPositionX: "-400px",
           }}
         >
@@ -128,9 +132,9 @@ const LoginScreen = () => {
                               Ghi nhớ mật khẩu
                             </span>
                           </Checkbox>
-                          <a href="#" className="text-white">
+                          <Link to="/forgot-password" className="text-white">
                             Quên mật khẩu?
-                          </a>
+                          </Link>
                         </div>
 
                         <Button
