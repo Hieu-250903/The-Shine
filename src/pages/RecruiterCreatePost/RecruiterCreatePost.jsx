@@ -3,26 +3,31 @@ import {
   PlusOutlined,
   UploadOutlined,
   UserOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
-import { Button, Flex, Form, Input, message, Upload } from "antd";
-import React, { useState } from "react";
+import { Button, Flex, Form, Input, message, Upload, Select, InputNumber, Switch } from "antd";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import createprofilebg from "../../assets/iamges/createprofilebg.jpg";
 import NotifyCpn from "../../components/NotifyCpn/NotifyCpn";
+import { getAllCategoriesApi } from "../../services/category";
+import { addJobApi } from "../../services/jobs";
 
 // Define Zod schema for form validation
 const postSchema = z.object({
-  companyName: z.string().min(1, "Vui lòng nhập tên công ty"),
+  title: z.string().min(1, "Vui lòng nhập tiêu đề"),
   position: z.string().min(1, "Vui lòng nhập vị trí tuyển dụng"),
-  requirements: z.string().min(1, "Vui lòng nhập yêu cầu"),
-  phone: z
-    .string()
-    .regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, "Số điện thoại không hợp lệ"),
-  experience: z.string().min(1, "Vui lòng nhập yêu cầu kinh nghiệm"),
-  website: z.string().url("URL không hợp lệ").optional().or(z.literal("")),
-  jobDescription: z.string().min(1, "Vui lòng nhập mô tả công việc"),
+  requirement: z.string().min(1, "Vui lòng nhập yêu cầu"),
+  description: z.string().min(1, "Vui lòng nhập mô tả"),
   jobDetails: z.string().min(1, "Vui lòng nhập chi tiết công việc"),
+  requirements: z.string().min(1, "Vui lòng nhập yêu cầu công việc"),
+  experience: z.string().min(1, "Vui lòng nhập kinh nghiệm"),
+  benefits: z.string().min(1, "Vui lòng nhập quyền lợi"),
+  salary: z.number().min(0, "Lương phải lớn hơn hoặc bằng 0"),
+  categoryId: z.string().min(1, "Vui lòng chọn danh mục"),
+  contactPhone: z.string().regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, "Số điện thoại không hợp lệ"),
+  isUrgent: z.boolean(),
 });
 
 const RecruiterCreatePost = () => {
@@ -31,7 +36,27 @@ const RecruiterCreatePost = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const [errors, setErrors] = useState({});
   const [isShowNotification, setIsShowNotification] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const response = await getAllCategoriesApi();
+        setCategories(Array.isArray(response) ? response : []);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        message.error("Không thể tải danh mục. Vui lòng thử lại sau.");
+        setCategories([]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const validateFormWithZod = (values) => {
     try {
@@ -71,14 +96,28 @@ const RecruiterCreatePost = () => {
 
       setLoading(true);
 
-      // Simulate API call
-      setTimeout(() => {
-        message.success("Bài đăng tuyển dụng đã được tạo thành công!");
-        form.resetFields();
-        setImageUrl(null);
-        setLoading(false);
-        setIsShowNotification(true);
-      }, 1500);
+      const apiBody = {
+        title: values.title,
+        position: values.position,
+        requirement: values.requirement,
+        description: values.description,
+        jobDetails: values.jobDetails,
+        requirements: values.requirements,
+        experience: values.experience,
+        benefits: values.benefits,
+        salary: values.salary,
+        categoryId: values.categoryId,
+        contactPhone: values.contactPhone,
+        isUrgent: values.isUrgent || false,
+      };
+
+      await addJobApi(apiBody);
+
+      message.success("Bài đăng tuyển dụng đã được tạo thành công!");
+      form.resetFields();
+      setImageUrl(null);
+      setLoading(false);
+      setIsShowNotification(true);
     } catch (error) {
       console.error("Error submitting form:", error);
       message.error("Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.");
@@ -111,25 +150,27 @@ const RecruiterCreatePost = () => {
   };
 
   return (
-    <div
-      className="flex justify-center items-center min-h-screen bg-cover bg-center bg-no-repeat relative"
-      style={{
-        backgroundImage: `url(${createprofilebg})`,
-      }}
-    >
-      <div className="absolute inset-0 bg-[rgba(0,0,0,.4)]" />
+    <div className="flex justify-center items-center min-h-screen bg-cover bg-center bg-no-repeat relative">
+      <div 
+        className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.7)] to-[rgba(0,0,0,0.5)]"
+        style={{
+          backgroundImage: `url(${createprofilebg})`,
+          backgroundBlendMode: 'overlay',
+        }}
+      />
+      
       {!isShowNotification ? (
-        <div className="w-full max-w-4xl p-6 bg-[rgba(0,0,0,.6)] z-10 mt-6">
-          <h1 className="text-center text-white text-3xl font-bold mb-8">
+        <div className="w-full max-w-4xl p-8 bg-[rgba(0,0,0,0.75)] backdrop-blur-sm z-10 m-4 rounded-lg shadow-2xl">
+          <h1 className="text-center text-white text-3xl font-bold mb-10">
             TẠO BÀI ĐĂNG TUYỂN DỤNG
           </h1>
 
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-col md:flex-row gap-8">
             {/* Left side - Upload company logo */}
-            <div className="w-full md:w-1/4 flex flex-col items-center">
+            {/* <div className="w-full md:w-1/4 flex flex-col items-center">
               <Upload {...imageUploadProps} onChange={handleImageUpload}>
                 <div
-                  className="w-40 h-48 bg-gray-200 flex flex-col items-center justify-center mb-2 rounded cursor-pointer hover:opacity-80 transition-opacity"
+                  className="w-full aspect-square max-w-[200px] bg-[rgba(255,255,255,0.1)] flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-[rgba(255,255,255,0.15)] transition-all duration-300 border-2 border-dashed border-gray-400"
                   style={
                     imageUrl
                       ? {
@@ -142,40 +183,134 @@ const RecruiterCreatePost = () => {
                 >
                   {!imageUrl && (
                     <>
-                      <UserOutlined className="text-4xl text-gray-400" />
-                      <p className="text-gray-500 text-sm mt-2">Logo công ty</p>
+                      <UserOutlined className="text-4xl text-gray-300" />
+                      <p className="text-gray-300 text-sm mt-2">Logo công ty</p>
+                      <p className="text-gray-400 text-xs mt-1">Nhấn để tải lên</p>
                     </>
                   )}
                 </div>
               </Upload>
-            </div>
+            </div> */}
 
-            <div className="w-full md:w-3/4">
+            {/* Right side - Form */}
+            <div className="w-full md:w-4/4">
               <Form
                 form={form}
                 layout="vertical"
                 onFinish={handleSubmit}
                 validateTrigger="onBlur"
+                initialValues={{ isUrgent: false }}
+                className="space-y-6"
               >
-                <Form.Item
-                  name="companyName"
-                  validateStatus={errors.companyName ? "error" : ""}
-                  help={errors.companyName}
-                >
-                  <Input
-                    placeholder="Tên công ty"
-                    className="h-10 border border-gray-500 !bg-transparent !text-white placeholder:!text-slate-200"
-                  />
-                </Form.Item>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Form.Item
+                    name="title"
+                    validateStatus={errors.title ? "error" : ""}
+                    help={errors.title}
+                    label={<span className="text-white">Tiêu đề</span>}
+                  >
+                    <Input
+                      placeholder="Tiêu đề"
+                      className="h-11 !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="position"
+                    validateStatus={errors.position ? "error" : ""}
+                    help={errors.position}
+                    label={<span className="text-white">Vị trí tuyển dụng</span>}
+                  >
+                    <Input
+                      placeholder="Vị trí tuyển dụng"
+                      className="h-11 !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300"
+                    />
+                  </Form.Item>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Form.Item
+                    name="categoryId"
+                    validateStatus={errors.categoryId ? "error" : ""}
+                    help={errors.categoryId}
+                    label={<span className="text-white">Danh mục</span>}
+                  >
+                    <Select
+                      placeholder="Chọn danh mục"
+                      className="category-select h-11"
+                      loading={loadingCategories}
+                      disabled={loadingCategories}
+                      dropdownStyle={{
+                        background: '#1f2937',
+                        borderColor: '#374151'
+                      }}
+                    >
+                      {Array.isArray(categories) && categories.map((category) => (
+                        <Select.Option 
+                          key={category.categoryId} 
+                          value={category.categoryId}
+                        >
+                          <div className="flex flex-col py-1">
+                            <span className="text-white text-base">{category.title}</span>
+                            <span className="text-gray-400 text-xs mt-1">{category.subItems}</span>
+                          </div>
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+
+                  <Form.Item
+                    name="salary"
+                    validateStatus={errors.salary ? "error" : ""}
+                    help={errors.salary}
+                    label={<span className="text-white">Lương (VNĐ)</span>}
+                  >
+                    <InputNumber
+                      placeholder="Nhập mức lương"
+                      className="h-11 w-full !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white"
+                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
+                      min={0}
+                    />
+                  </Form.Item>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Form.Item
+                    name="contactPhone"
+                    validateStatus={errors.contactPhone ? "error" : ""}
+                    help={errors.contactPhone}
+                    label={<span className="text-white">Số điện thoại liên hệ</span>}
+                  >
+                    <Input
+                      placeholder="Số điện thoại liên hệ"
+                      className="h-11 !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300"
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="experience"
+                    validateStatus={errors.experience ? "error" : ""}
+                    help={errors.experience}
+                    label={<span className="text-white">Kinh nghiệm yêu cầu</span>}
+                  >
+                    <Input
+                      placeholder="Kinh nghiệm yêu cầu"
+                      className="h-11 !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300"
+                    />
+                  </Form.Item>
+                </div>
 
                 <Form.Item
-                  name="position"
-                  validateStatus={errors.position ? "error" : ""}
-                  help={errors.position}
+                  name="requirement"
+                  validateStatus={errors.requirement ? "error" : ""}
+                  help={errors.requirement}
+                  label={<span className="text-white">Yêu cầu cơ bản</span>}
                 >
-                  <Input
-                    placeholder="Vị trí tuyển dụng"
-                    className="h-10 border border-gray-500 !bg-transparent !text-white placeholder:!text-slate-200"
+                  <Input.TextArea
+                    placeholder="Yêu cầu cơ bản"
+                    rows={4}
+                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
                   />
                 </Form.Item>
 
@@ -183,89 +318,70 @@ const RecruiterCreatePost = () => {
                   name="requirements"
                   validateStatus={errors.requirements ? "error" : ""}
                   help={errors.requirements}
+                  label={<span className="text-white">Yêu cầu công việc chi tiết</span>}
                 >
-                  <Input
-                    placeholder="Yêu cầu công việc"
-                    className="h-10 border border-gray-500 !bg-transparent !text-white placeholder:!text-slate-200"
+                  <Input.TextArea
+                    placeholder="Yêu cầu công việc chi tiết"
+                    rows={4}
+                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
                   />
                 </Form.Item>
 
                 <Form.Item
-                  name="phone"
-                  validateStatus={errors.phone ? "error" : ""}
-                  help={errors.phone}
-                >
-                  <Input
-                    placeholder="Số điện thoại liên hệ"
-                    className="h-10 border border-gray-500 !bg-transparent !text-white placeholder:!text-slate-200"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="experience"
-                  validateStatus={errors.experience ? "error" : ""}
-                  help={errors.experience}
-                >
-                  <Input
-                    placeholder="Yêu cầu kinh nghiệm"
-                    className="h-10 border border-gray-500 !bg-transparent !text-white placeholder:!text-slate-200"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="website"
-                  validateStatus={errors.website ? "error" : ""}
-                  help={errors.website}
-                >
-                  <Input
-                    placeholder="Website công ty"
-                    className="h-10 border border-gray-500 !bg-transparent !text-white placeholder:!text-slate-200"
-                    prefix={<LinkOutlined className="text-gray-400" />}
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="jobDescription"
-                  validateStatus={errors.jobDescription ? "error" : ""}
-                  help={errors.jobDescription}
+                  name="description"
+                  validateStatus={errors.description ? "error" : ""}
+                  help={errors.description}
+                  label={<span className="text-white">Mô tả công việc</span>}
                 >
                   <Input.TextArea
                     placeholder="Mô tả công việc"
                     rows={4}
-                    className="border border-gray-500 !bg-transparent !text-white placeholder:!text-slate-200 resize-none"
+                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
                   />
-                </Form.Item>
-
-                <Form.Item>
-                  <p className="text-white mb-2">Bộ lọc bài đăng</p>
-                  <Flex>
-                    <div className="rounded-tl-full rounded-bl-full w-32 border border-white cursor-pointer flex justify-center items-center text-white py-2">
-                      <p>CHỌN BỘ LỌC</p>
-                    </div>
-                    <div className="rounded-tr-full rounded-br-full w-20 border border-white cursor-pointer flex justify-center items-center bg-white py-2">
-                      <PlusOutlined className="!text-black" />
-                    </div>
-                  </Flex>
                 </Form.Item>
 
                 <Form.Item
                   name="jobDetails"
                   validateStatus={errors.jobDetails ? "error" : ""}
                   help={errors.jobDetails}
-                  className="!mt-6"
+                  label={<span className="text-white">Chi tiết công việc</span>}
                 >
                   <Input.TextArea
                     placeholder="Chi tiết công việc"
                     rows={4}
-                    className="border border-gray-500 !bg-transparent !text-white placeholder:!text-slate-200 resize-none"
+                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
                   />
                 </Form.Item>
 
-                <Form.Item className="flex justify-center mt-6">
+                <Form.Item
+                  name="benefits"
+                  validateStatus={errors.benefits ? "error" : ""}
+                  help={errors.benefits}
+                  label={<span className="text-white">Quyền lợi</span>}
+                >
+                  <Input.TextArea
+                    placeholder="Quyền lợi"
+                    rows={4}
+                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
+                  />
+                </Form.Item>
+
+                <div className="flex items-center gap-3">
+                  <Form.Item
+                    name="isUrgent"
+                    valuePropName="checked"
+                    className="mb-0"
+                  >
+                    <Switch className="bg-gray-600" />
+                  </Form.Item>
+                  <span className="text-white">Tuyển gấp</span>
+                </div>
+
+                <Form.Item className="flex justify-center mb-0">
                   <Button
                     type="primary"
                     htmlType="submit"
-                    className="h-12 px-8 rounded bg-red-500 hover:bg-red-600 border-none font-medium"
+                    className="h-12 px-12 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 border-none font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                     loading={loading}
                   >
                     ĐĂNG TUYỂN
@@ -288,6 +404,47 @@ const RecruiterCreatePost = () => {
           />
         </div>
       )}
+
+      <style jsx="true">{`
+        .category-select .ant-select-selector {
+          background-color: rgba(255, 255, 255, 0.1) !important;
+          border-color: rgb(107, 114, 128) !important;
+          height: 44px !important;
+          padding: 0 16px !important;
+          color: white !important;
+        }
+        
+        .category-select .ant-select-selection-placeholder {
+          color: rgb(156, 163, 175) !important;
+          line-height: 44px !important;
+        }
+        
+        .category-select .ant-select-selection-item {
+          line-height: 44px !important;
+          color: white !important;
+        }
+        
+        .category-select:hover .ant-select-selector {
+          background-color: rgba(255, 255, 255, 0.15) !important;
+        }
+        
+        .ant-select-dropdown {
+          background-color: rgb(31, 41, 55) !important;
+          border: 1px solid rgb(55, 65, 81) !important;
+        }
+        
+        .ant-select-item {
+          color: white !important;
+        }
+        
+        .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+          background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+          background-color: rgba(255, 255, 255, 0.2) !important;
+        }
+      `}</style>
     </div>
   );
 };
