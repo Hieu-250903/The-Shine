@@ -1,8 +1,21 @@
-import { useState } from "react";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons";
-import { Rate } from "antd";
+import {
+  FileOutlined,
+  LeftOutlined,
+  RightOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import { Rate, message } from "antd";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useresumebg from "../../assets/iamges/useresumebg.jpg";
+import {
+  addCVFile,
+  downloadFile,
+  getFileById,
+  getFileUserInfo,
+  uploadFile,
+} from "../../services/file";
+
 export const profileData = {
   viewMode: {
     title: "THE SHINE",
@@ -41,11 +54,158 @@ const CandidateProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [userFiles, setUserFiles] = useState([]);
+  const fileInputRef = useRef(null);
+
   const data = isEditMode ? profileData.editMode : profileData.viewMode;
 
+  useEffect(() => {
+    loadUserFiles();
+  }, []);
+
+  const loadUserFiles = async () => {
+    try {
+      setLoading(true);
+      const response = await getFileUserInfo();
+      if (response) {
+        setUserFiles(response);
+        const cvFile = response.find((file) => file.type === "cv");
+        if (cvFile) {
+          setUploadedFile({
+            id: cvFile.id,
+            name: cvFile.originalName || cvFile.name,
+            url: cvFile.url || cvFile.link,
+            size: cvFile.size
+              ? `${(cvFile.size / 1024 / 1024).toFixed(2)} MB`
+              : "N/A",
+            uploadDate: cvFile.createdAt
+              ? new Date(cvFile.createdAt).toLocaleString("vi-VN")
+              : "N/A",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error loading user files:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSave = () => {
-    // Xử lý lưu dữ liệu ở đây
     setIsEditMode(false);
+    message.success("Đã lưu thông tin hồ sơ");
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      message.error("Chỉ chấp nhận file PDF!");
+      return;
+    }
+
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      message.error("File không được vượt quá 10MB!");
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await uploadFile(formData);
+
+      if (response.link || response.id) {
+        setUploadedFile({
+          id: response.id,
+          name: file.name,
+          url: response.link || response.url,
+          size: (file.size / 1024 / 1024).toFixed(2) + " MB",
+          uploadDate: new Date().toLocaleString("vi-VN"),
+        });
+        if (response.id) {
+          try {
+            const resCv = await addCVFile(response.id);
+            if (resCv.isSucceed) {
+              message.success(
+                "Tải lên CV thành công và đã liên kết với hồ sơ!"
+              );
+            }
+          } catch (cvError) {
+            console.error("Error adding CV file:", cvError);
+            message.success("Tải lên CV thành công!");
+          }
+        } else {
+          message.success("Tải lên CV thành công!");
+        }
+        loadUserFiles();
+      } else {
+        throw new Error(
+          response?.message || "Upload failed - Invalid response format"
+        );
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      const errorMessage =
+        error.response?.data?.message || error.message || "Tải lên thất bại";
+      message.error(`Tải lên thất bại: ${errorMessage}`);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const openFileUpload = () => {
+    fileInputRef.current?.click();
+  };
+  const viewUploadedFile = () => {
+    if (!uploadedFile?.id) {
+      message.error("Không có thông tin file để xem");
+      return;
+    }
+
+    navigate(`/cv/${uploadedFile.id}`);
+  };
+
+  const removeUploadedFile = () => {
+    setUploadedFile(null);
+    message.success("Đã xóa file CV khỏi hồ sơ");
+  };
+
+  const downloadCV = async () => {
+    if (!uploadedFile?.id) {
+      message.error("Không có file để tải xuống");
+      return;
+    }
+
+    try {
+      const response = await downloadFile(uploadedFile.id);
+      if (response) {
+        const blob = new Blob([response], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download =
+          uploadedFile?.name || uploadedFile?.originalName || "CV.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        message.success("Tải xuống thành công!");
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      message.error("Tải xuống thất bại. Vui lòng thử lại!");
+    }
   };
 
   return (
@@ -59,6 +219,12 @@ const CandidateProfile = () => {
       }}
     >
       <div className="bg-[rgba(0,0,0,.4)] pb-6">
+        {loading && (
+          <div className="text-center py-4">
+            <span className="text-white">Đang tải thông tin...</span>
+          </div>
+        )}
+
         <div className="flex items-start gap-10">
           <div className="flex flex-col p-2 px-8">
             <div className="relative">
@@ -179,17 +345,80 @@ const CandidateProfile = () => {
                 HỒ SƠ
               </h2>
               {isEditMode ? (
-                <div className="flex">
-                  <button className="bg-white rounded-tl-full rounded-bl-full px-6 py-2 text-black cursor-pointer">
-                    CV
-                  </button>
-                  <button className="bg-[#A15037] px-6 py-2 hover:bg-white hover:text-black cursor-pointer uppercase rounded-tr-full rounded-br-full">
-                    Đổi file
-                  </button>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex items-center gap-4 mb-3">
+                      <button
+                        onClick={openFileUpload}
+                        disabled={uploading}
+                        className="bg-white rounded-full px-6 py-2 text-black cursor-pointer hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        <UploadOutlined />
+                        {uploading ? "Đang tải lên..." : "Tải lên CV (PDF)"}
+                      </button>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                    {uploadedFile && (
+                      <div className="bg-white/10 rounded-lg p-4 border border-white/20">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <FileOutlined className="text-xl text-red-400" />
+                            <div>
+                              <p className="font-semibold text-white">
+                                {uploadedFile.name}
+                              </p>
+                              <div className="flex gap-4 text-xs text-gray-300">
+                                <span>Kích thước: {uploadedFile.size}</span>
+                                <span>ID: {uploadedFile.id}</span>
+                              </div>
+                              <p className="text-xs text-gray-300">
+                                Tải lên: {uploadedFile.uploadDate}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={viewUploadedFile}
+                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                            >
+                              Xem PDF
+                            </button>
+                            <button
+                              onClick={downloadCV}
+                              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                            >
+                              Tải xuống
+                            </button>
+                            <button
+                              onClick={removeUploadedFile}
+                              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                            >
+                              Xóa
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex">
+                    <button className="bg-[#A15037] px-6 py-2 hover:bg-white hover:text-black cursor-pointer uppercase rounded-full">
+                      Sửa đường link Portfolio
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex gap-4">
-                  <button className="border-2 border-white rounded-full px-6 py-2 hover:bg-white hover:text-black cursor-pointer">
+                  <button
+                    onClick={uploadedFile ? viewUploadedFile : undefined}
+                    className="border-2 border-white rounded-full px-6 py-2 hover:bg-white hover:text-black cursor-pointer"
+                  >
                     {data.files.cv}
                   </button>
                   <button className="border-2 border-white rounded-full px-6 py-2 hover:bg-white hover:text-black cursor-pointer uppercase">

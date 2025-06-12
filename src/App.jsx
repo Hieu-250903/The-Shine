@@ -23,10 +23,14 @@ import RecruiterCreatePost from "./pages/RecruiterCreatePost/RecruiterCreatePost
 import ServicePackages from "./pages/ServicePackages/ServicePackages";
 import PaymentPackage from "./pages/PaymentPackage/PaymentPackage";
 import CandidateInfo from "./pages/CandidateInfo/CandidateInfo";
-import { message } from "antd";
 import ConfirmEmail from "./pages/Auth/ConfirmEmail/ConfirmEmail";
 import ForgotPassword from "./pages/Auth/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword/ResetPassword";
+import CVViewer from "./pages/CVViewer/CVViewer";
+import PaymentReturn from "./pages/PaymentPackage/PaymentReturn/PaymentReturn";
+import PaymentHistory from "./pages/PaymentHistory/PaymentHistory";
+import RecruiterRegister from "./pages/Auth/Register/RecruiterRegister";
+import Company from "./pages/Company/Company";
 
 const App = () => {
   const router = createBrowserRouter(
@@ -34,11 +38,13 @@ const App = () => {
       <Route path="/">
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/register-recruiter" element={<RecruiterRegister />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        
+
         <Route path="/role-selection" element={<RoleSelection />} />
+        <Route path="/cv/:id" element={<CVViewer />} />
 
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
@@ -49,6 +55,10 @@ const App = () => {
           <Route path="/job-application/:id" element={<JobApplication />} />
           <Route path="/profile" element={<CandidateProfile />} />
           <Route path="/candidate-info/:id" element={<CandidateInfo />} />
+          <Route path="/payment-return/:type" element={<PaymentReturn />} />
+          <Route path="/payment-history" element={<PaymentHistory />} />
+          <Route path="/company" element={<Company />} />
+
           <Route
             path="/candidate-create-profile"
             element={<CandidateCreateProfile />}

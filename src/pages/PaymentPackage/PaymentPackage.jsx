@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import paymentBkgBg from "../../assets/iamges/paymentBkgBg.jpg";
 import NotifyCpn from "../../components/NotifyCpn/NotifyCpn";
+import { createPaymentApi } from "../../services/payment";
 const packageData = {
   basic: {
     title: "GÓI CƠ BẢN",
@@ -55,9 +56,39 @@ const PaymentPackage = () => {
   if (!data) {
     return <div>Không tìm thấy gói phù hợp.</div>;
   }
-  const handlePayment = () => {
-    setIspayment(true);
+  const handlePayment = async () => {
+    try {
+      const amountMap = {
+        basic: 299000,
+        nomal: 599000,
+        advanced: 999000,
+      };
+
+      const response = await createPaymentApi({
+        orderCode: Date.now(),
+        amount: amountMap[type],
+        description: data.title,
+        items: [
+          {
+            name: data.title,
+            quantity: 1,
+            price: amountMap[type],
+          },
+        ],
+        cancelUrl: `${window.location.origin}/payment-return/cancel`,
+        returnUrl: `${window.location.origin}/payment-return/success`,
+      });
+
+      if (response?.checkoutUrl) {
+        window.location.href = response.checkoutUrl;
+      } else {
+        console.error("Không có paymentUrl trong response");
+      }
+    } catch (err) {
+      console.error("Lỗi khi tạo đơn thanh toán:", err);
+    }
   };
+
   return (
     <div
       className="text-white flex flex-col items-center py-10"

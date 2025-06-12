@@ -1,5 +1,8 @@
 import instance from "../configs/instance";
 
+const registerRecruiterApi = async (formData) => {
+  return await instance.post("/user/register-recruiter", formData);
+};
 const registerApi = async (formData) => {
   return await instance.post("/user/register", formData);
 };
@@ -31,4 +34,5 @@ export {
   resendEmailApi,
   forgotPasswordApi,
   resetPasswordApi,
+  registerRecruiterApi,
 };

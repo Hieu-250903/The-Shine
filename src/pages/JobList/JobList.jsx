@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input, Button, Tag, Carousel, Rate } from "antd";
 import {
   SearchOutlined,
@@ -9,11 +9,16 @@ import {
 import jobListbackground from "../../assets/iamges/jobListbackground.jpg";
 import Pagination from "../../components/Pagination/Pagination";
 import { useNavigate } from "react-router-dom";
+import { getAllJobApi } from "../../services/job";
+
 const JobList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeStarFilter, setActiveStarFilter] = useState(null);
-  const [currentPage, setCurrentPage] = useState(3);
+  const [allJob, setAllJob] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const navigator = useNavigate();
+
   const tags = [
     { id: "nhaplieu", name: "Nhập liệu" },
     { id: "vienbao", name: "Viễn bảo cáo" },
@@ -24,102 +29,61 @@ const JobList = () => {
     { id: "phantichdulieu", name: "Phân tích dữ liệu" },
     { id: "vietkontent", name: "Viết content" },
   ];
+
   const imageList = [
     "https://i.pinimg.com/736x/6b/50/68/6b5068b66531d8a8825aa408104d957c.jpg",
     "https://i.pinimg.com/736x/12/5e/e3/125ee335832eab312813ed678a769148.jpg",
     "https://i.pinimg.com/736x/d5/95/dc/d595dc6745451258f1c41c37c94af583.jpg",
   ];
-  const jobListings = [
-    {
-      id: 1,
-      date: "23/03/2023",
-      companyName: "TLC Corp",
-      location: "079187",
-      jobFunction: "Digital marketing",
-      requirement: "Có bằng cấp",
-      contact: "0123456789",
-      rating: 5,
-      image:
-        "https://i.pinimg.com/736x/ee/16/f9/ee16f9bd17e80b730e8207418e7806d6.jpg",
-    },
-    {
-      id: 2,
-      date: "22/03/2023",
-      companyName: "TLC Corp",
-      location: "079187",
-      jobFunction: "Digital marketing",
-      requirement: "Có bằng cấp",
-      contact: "0123456789",
-      rating: 4,
-      image:
-        "https://i.pinimg.com/736x/ee/16/f9/ee16f9bd17e80b730e8207418e7806d6.jpg",
-    },
-    {
-      id: 3,
-      date: "21/03/2023",
-      companyName: "TLC Corp",
-      location: "079187",
-      jobFunction: "Web Developer",
-      requirement: "Có bằng cấp",
-      contact: "0123456789",
-      rating: 3,
-      image:
-        "https://i.pinimg.com/736x/ee/16/f9/ee16f9bd17e80b730e8207418e7806d6.jpg",
-    },
-    {
-      id: 4,
-      date: "20/03/2023",
-      companyName: "TLC Corp",
-      location: "079187",
-      jobFunction: "Graphic Designer",
-      requirement: "Có bằng cấp",
-      contact: "0123456789",
-      rating: 2,
-      image:
-        "https://i.pinimg.com/736x/ee/16/f9/ee16f9bd17e80b730e8207418e7806d6.jpg",
-    },
-    {
-      id: 5,
-      date: "19/03/2023",
-      companyName: "TLC Corp",
-      location: "079187",
-      jobFunction: "Content Writer",
-      requirement: "Có bằng cấp",
-      contact: "0123456789",
-      rating: 1,
-      image:
-        "https://i.pinimg.com/736x/ee/16/f9/ee16f9bd17e80b730e8207418e7806d6.jpg",
-    },
-  ];
+
+  useEffect(() => {
+    const fetchAllJob = async () => {
+      setLoading(true);
+      try {
+        const res = await getAllJobApi();
+        if (res) {
+          setAllJob(res);
+        }
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllJob();
+  }, []);
 
   const handleStarFilter = (rating) => {
     if (activeStarFilter === rating) {
-      setActiveStarFilter(null); // Toggle off if the same filter is clicked
+      setActiveStarFilter(null);
     } else {
       setActiveStarFilter(rating);
     }
   };
 
-  const filteredJobs = jobListings.filter((job) => {
-    // Filter by star rating if active
-    if (activeStarFilter !== null && job.rating !== activeStarFilter) {
-      return false;
-    }
+  // Filter jobs based on search term and star rating
+  const filteredJobs = allJob.filter((job) => {
+    // Filter by star rating if active (since API doesn't have rating, we'll skip this filter for now)
+    // if (activeStarFilter !== null && job.rating !== activeStarFilter) {
+    //   return false;
+    // }
 
-    // Filter by search term if present
-    if (
-      searchTerm &&
-      !job.companyName.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !job.jobFunction.toLowerCase().includes(searchTerm.toLowerCase())
-    ) {
-      return false;
+    // Filter by search term
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        job.companyName?.toLowerCase().includes(searchLower) ||
+        job.title?.toLowerCase().includes(searchLower) ||
+        job.position?.toLowerCase().includes(searchLower) ||
+        job.location?.toLowerCase().includes(searchLower)
+      );
     }
 
     return true;
   });
 
   return (
-    <div className="flex flex-col min-h-screen  text-white">
+    <div className="flex flex-col min-h-screen text-white">
       <Carousel autoplay className="relative">
         {imageList.map((url, index) => (
           <div key={index}>
@@ -156,8 +120,7 @@ const JobList = () => {
             <CommentOutlined className="text-2xl bg-red-500 p-2 rounded-full cursor-pointer" />
           </nav>
 
-          {/* Tags Section */}
-          <div className="p-4 ">
+          <div className="p-4">
             <div className="flex items-center mb-2 justify-center">
               <span className="mr-2 text-sm">TAG:</span>
               <div className="flex flex-wrap gap-2">
@@ -202,24 +165,32 @@ const JobList = () => {
             </div>
           </div>
         </div>
+
         <div className="flex-1 bg-[rgba(0,0,0,.3)] p-4">
           <div className="mx-auto max-w-3/4 bg-[rgba(0,0,0,.6)] p-10 rounded-md">
-            {filteredJobs.length > 0 ? (
+            {loading ? (
+              <div className="text-center py-8">
+                <p>Đang tải dữ liệu...</p>
+              </div>
+            ) : filteredJobs.length > 0 ? (
               filteredJobs.map((job) => (
-                <div key={job.id} className="mb-4  rounded-lg overflow-hidden">
+                <div
+                  key={job.jobId}
+                  className="mb-4 rounded-lg overflow-hidden"
+                >
                   <div className="flex">
                     <div className="flex-1">
                       <div className="flex items-center gap-4">
                         <div className="relative w-56 h-64 overflow-hidden rounded-lg">
                           <img
-                            src={job.image}
+                            src="https://i.pinimg.com/736x/ee/16/f9/ee16f9bd17e80b730e8207418e7806d6.jpg"
                             alt={job.companyName}
                             className="w-full h-full object-cover mb-2"
                           />
                           <div className="absolute bottom-0 right-0 left-0 bg-[rgba(0,0,0,.8)] p-2 flex flex-col items-center gap-2">
-                            <Rate value={job.rating} className="!text-xs" />
+                            <Rate value={0} className="!text-xs" disabled />
                             <div className="text-md font-bold text-white">
-                              TLC CORP
+                              {job.companyName || "N/A"}
                             </div>
                           </div>
                         </div>
@@ -229,13 +200,21 @@ const JobList = () => {
                               Tên công ty:
                             </div>
                             <div className="text-xs text-slate-200">
-                              {job.companyName}
+                              {job.companyName || "N/A"}
                             </div>
                           </div>
                           <div className="mb-2 flex items-center gap-6">
                             <div className="text-md font-bold w-36">ID:</div>
                             <div className="text-xs text-slate-200">
-                              {job.location}
+                              {job.jobId?.substring(0, 8) || "N/A"}
+                            </div>
+                          </div>
+                          <div className="mb-2 flex items-center gap-6">
+                            <div className="text-md font-bold w-36">
+                              Tiêu đề:
+                            </div>
+                            <div className="text-xs text-slate-200">
+                              {job.title || "N/A"}
                             </div>
                           </div>
                           <div className="mb-2 flex items-center gap-6">
@@ -243,7 +222,7 @@ const JobList = () => {
                               Vị trí tuyển dụng:
                             </div>
                             <div className="text-xs text-slate-200">
-                              {job.jobFunction}
+                              {job.position || "N/A"}
                             </div>
                           </div>
                           <div className="mb-2 flex items-center gap-6">
@@ -251,7 +230,25 @@ const JobList = () => {
                               Yêu cầu:
                             </div>
                             <div className="text-xs text-slate-200">
-                              {job.requirement}
+                              {job.requirements || "N/A"}
+                            </div>
+                          </div>
+                          <div className="mb-2 flex items-center gap-6">
+                            <div className="text-md font-bold w-36">
+                              Địa điểm:
+                            </div>
+                            <div className="text-xs text-slate-200">
+                              {job.location || "N/A"}
+                            </div>
+                          </div>
+                          <div className="mb-2 flex items-center gap-6">
+                            <div className="text-md font-bold w-36">
+                              Mức lương:
+                            </div>
+                            <div className="text-xs text-slate-200">
+                              {job.salary
+                                ? `${job.salary.toLocaleString()} VNĐ`
+                                : "N/A"}
                             </div>
                           </div>
                           <div className="mb-4">
@@ -259,8 +256,33 @@ const JobList = () => {
                               Liên hệ:
                             </div>
                             <div className="text-xs text-slate-200">
-                              {job.contact}
+                              {job.contactPhone || "N/A"}
                             </div>
+                          </div>
+                          <div className="mb-2 flex items-center gap-6">
+                            <div className="text-md font-bold w-36">
+                              Trạng thái:
+                            </div>
+
+                            {job.isUrgent ? (
+                              <div className="mb-2">
+                                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded">
+                                  TUYỂN GẤP
+                                </span>
+                              </div>
+                            ) : (
+                              <div
+                                className={`text-xs px-2 py-1 rounded ${
+                                  job.status === "Open"
+                                    ? "bg-green-500 text-white"
+                                    : "bg-gray-500 text-white"
+                                }`}
+                              >
+                                {job.status === "Open"
+                                  ? "Đang tuyển"
+                                  : job.status}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -269,7 +291,7 @@ const JobList = () => {
                       <div className="text-right">
                         <Button
                           className="bg-teal-600 text-white border-0 hover:bg-teal-700"
-                          onClick={() => navigator(`/job-detail/${job.id}`)}
+                          onClick={() => navigator(`/job-detail/${job.jobId}`)}
                         >
                           ỨNG TUYỂN
                         </Button>
@@ -283,10 +305,12 @@ const JobList = () => {
                 <p>Không tìm thấy công việc phù hợp với bộ lọc</p>
               </div>
             )}
+
             <div className="p-4">
               <Pagination
                 current={currentPage}
-                total={50}
+                total={allJob.length}
+                pageSize={10}
                 onChange={(page) => setCurrentPage(page)}
               />
             </div>

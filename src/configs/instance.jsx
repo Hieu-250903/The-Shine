@@ -7,7 +7,7 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   function (config) {
-    const token = Cookie.get("token");
+    const token = Cookie.get("accessToken");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }

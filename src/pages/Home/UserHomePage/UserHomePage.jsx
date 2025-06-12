@@ -1,85 +1,23 @@
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Button } from "antd";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import createCvbackground from "../../../assets/iamges/createCvbackground.jpg";
 import workdayBackground from "../../../assets/iamges/workdayBackground.jpg";
 import { useNavigate } from "react-router-dom";
+import { getAllCategory } from "../../../services/category";
 const UserHomePage = () => {
   const navigate = useNavigate();
-  const jobCategories = [
-    {
-      title: "CÔNG NGHỆ & LẬP TRÌNH",
-      items: [
-        "Lập trình nền dựng",
-        "Quản trị hệ thống",
-        "Điểm tích hợp lệ với",
-        "Viết mã tự động hóa",
-      ],
-    },
-    {
-      title: "THIẾT KẾ & SÁNG TẠO",
-      items: [
-        "Thiết kế đồ họa",
-        "Dựng video",
-        "Thiết kế UI/UX",
-        "Chỉnh sửa ảnh",
-      ],
-    },
-    {
-      title: "VIẾT LÁCH & DỊCH THUẬT",
-      items: [
-        "Viết content",
-        "Biên tập nội dung",
-        "Dịch thuật đa ngôn ngữ",
-        "Viết báo cáo",
-      ],
-    },
-    {
-      title: "TIẾP THỊ & QUẢNG CÁO",
-      items: [
-        "SEO marketing",
-        "Chạy quảng cáo",
-        "Viết kịch bản",
-        "Email marketing",
-      ],
-    },
-    {
-      title: "HỖ TRỢ KINH DOANH",
-      items: [
-        "Nhập liệu",
-        "Hỗ trợ khách hàng",
-        "Quản trị đơn hàng",
-        "Gọi điện khảo sát",
-      ],
-    },
-    {
-      title: "SỰ KIỆN & GIẢI TRÍ",
-      items: [
-        "Quay livestream",
-        "MC/Bản chương trình",
-        "Dựng video sự kiện",
-        "Tổ chức trò chơi",
-      ],
-    },
-    {
-      title: "GIÁO DỤC & GIA SƯ",
-      items: [
-        "Dạy kèm tại nhà",
-        "Hướng dẫn học online",
-        "Soạn giáo án",
-        "Huấn luyện viên cá nhân",
-      ],
-    },
-    {
-      title: "LAO ĐỘNG PHỔ THÔNG",
-      items: [
-        "Giao hàng nhanh",
-        "Giúp việc cá nhân",
-        "Sửa chữa điện nước",
-        "Chăm sóc cây cảnh",
-      ],
-    },
-  ];
+  const [jobCategories, setJobCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategoryData = async () => {
+      const res = await getAllCategory();
+      console.log("res", res);
+      if (res) {
+        setJobCategories(res);
+      }
+    };
+    fetchCategoryData();
+  }, []);
   return (
     <div className="w-full">
       <section className="relative min-h-screen w-full overflow-hidden">
@@ -156,7 +94,6 @@ const UserHomePage = () => {
         </div>
       </section>
       <div className="relative w-full min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-        {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-20"
           style={{
@@ -170,10 +107,10 @@ const UserHomePage = () => {
           </h1>
 
           <div className="space-y-8">
-            {jobCategories.map((category, index) => (
+            {jobCategories?.map((category, index) => (
               <div
                 onClick={() =>
-                  navigate(`/job-list?category=${category.title}}`)
+                  navigate(`/job-list?category=${category.categoryId}}`)
                 }
                 key={index}
                 className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
@@ -183,12 +120,13 @@ const UserHomePage = () => {
                 </h2>
 
                 <ul className="space-y-2 mb-6">
-                  {category.items.map((item, i) => (
-                    <li key={i} className="text-gray-700 flex items-start">
-                      <span className="inline-block w-1.5 h-1.5 mt-2 mr-2 bg-blue-500 rounded-full"></span>
-                      {item}
-                    </li>
-                  ))}
+                  {category?.subItems &&
+                    category.subItems.split(",").map((item, i) => (
+                      <li key={i} className="text-gray-700 flex items-start">
+                        <span className="inline-block w-1.5 h-1.5 mt-2 mr-2 bg-blue-500 rounded-full"></span>
+                        {item.trim()}
+                      </li>
+                    ))}
                 </ul>
 
                 <div className="text-right">

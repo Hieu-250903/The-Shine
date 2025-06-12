@@ -1,6 +1,6 @@
 import instance from "../configs/instance";
 
-const getAllCategoriesApi = async () => {
+const getAllCategory = async () => {
   return await instance.get("/Category/GetAll");
 };
-export { getAllCategoriesApi };
+export { getAllCategory };

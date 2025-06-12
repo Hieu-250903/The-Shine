@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import loginBg from "../../../assets/iamges/loginBg.jpg";
 import { loginApi } from "../../../services/auth";
+import { jwtDecode } from "jwt-decode";
 const loginSchema = z.object({
   email: z.string().email({ message: "Email không hợp lệ" }),
   password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
@@ -37,7 +38,22 @@ const LoginScreen = () => {
         message.success("Đăng nhập thành công");
         Cookie.set("accessToken", res.data.accessToken);
         Cookie.set("refreshToken", res.data.refreshToken);
-        navigate("/role-selection");
+        localStorage.setItem("isAuthen", "true");
+        const decodeToken = jwtDecode(res.data.accessToken);
+        const role =
+          decodeToken[
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+          ];
+        const id =
+          decodeToken[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+          ];
+        localStorage.setItem("userInfo", JSON.stringify({ ...formData, id }));
+        localStorage.setItem(
+          "role",
+          role === "Candidate" ? "candidate" : "recruiter"
+        );
+        navigate("/");
       } else {
         message.error("Thông tin tài khoản và mật khẩu không chính xác");
       }

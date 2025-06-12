@@ -1,450 +1,354 @@
-import {
-  LinkOutlined,
-  PlusOutlined,
-  UploadOutlined,
-  UserOutlined,
-  DollarOutlined,
-} from "@ant-design/icons";
-import { Button, Flex, Form, Input, message, Upload, Select, InputNumber, Switch } from "antd";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import createprofilebg from "../../assets/iamges/createprofilebg.jpg";
 import NotifyCpn from "../../components/NotifyCpn/NotifyCpn";
-import { getAllCategoriesApi } from "../../services/category";
-import { addJobApi } from "../../services/jobs";
+import { createjobApi } from "../../services/job";
+import { getAllCategory } from "../../services/category";
+import { message } from "antd";
 
-// Define Zod schema for form validation
 const postSchema = z.object({
   title: z.string().min(1, "Vui lòng nhập tiêu đề"),
   position: z.string().min(1, "Vui lòng nhập vị trí tuyển dụng"),
   requirement: z.string().min(1, "Vui lòng nhập yêu cầu"),
-  description: z.string().min(1, "Vui lòng nhập mô tả"),
+  description: z.string().min(1, "Vui lòng nhập mô tả công việc"),
   jobDetails: z.string().min(1, "Vui lòng nhập chi tiết công việc"),
-  requirements: z.string().min(1, "Vui lòng nhập yêu cầu công việc"),
-  experience: z.string().min(1, "Vui lòng nhập kinh nghiệm"),
+  requirements: z.string().min(1, "Vui lòng nhập yêu cầu chi tiết"),
+  experience: z.string().min(1, "Vui lòng nhập yêu cầu kinh nghiệm"),
   benefits: z.string().min(1, "Vui lòng nhập quyền lợi"),
-  salary: z.number().min(0, "Lương phải lớn hơn hoặc bằng 0"),
+  salary: z.number().min(0, "Mức lương phải lớn hơn 0"),
   categoryId: z.string().min(1, "Vui lòng chọn danh mục"),
-  contactPhone: z.string().regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, "Số điện thoại không hợp lệ"),
+  contactPhone: z
+    .string()
+    .regex(/(84|0[3|5|7|8|9])+([0-9]{8})\b/g, "Số điện thoại không hợp lệ"),
   isUrgent: z.boolean(),
 });
 
 const RecruiterCreatePost = () => {
-  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
-  const [errors, setErrors] = useState({});
   const [isShowNotification, setIsShowNotification] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [allCategory, setAllCategory] = useState([]);
   const navigate = useNavigate();
-
+  const fetchCatregoryData = async () => {
+    const res = await getAllCategory();
+    if (res) {
+      setAllCategory(res);
+    }
+  };
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoadingCategories(true);
-        const response = await getAllCategoriesApi();
-        setCategories(Array.isArray(response) ? response : []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        message.error("Không thể tải danh mục. Vui lòng thử lại sau.");
-        setCategories([]);
-      } finally {
-        setLoadingCategories(false);
-      }
-    };
-
-    fetchCategories();
+    fetchCatregoryData();
   }, []);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch,
+  } = useForm({
+    resolver: zodResolver(postSchema),
+    defaultValues: {
+      title: "",
+      position: "",
+      requirement: "",
+      description: "",
+      jobDetails: "",
+      requirements: "",
+      experience: "",
+      benefits: "",
+      salary: 0,
+      categoryId: "",
+      contactPhone: "",
+      isUrgent: false,
+    },
+  });
 
-  const validateFormWithZod = (values) => {
-    try {
-      postSchema.parse(values);
-      setErrors({});
-      return true;
-    } catch (error) {
-      if (error.errors) {
-        const newErrors = {};
-        error.errors.forEach((err) => {
-          const path = err.path.join(".");
-          newErrors[path] = err.message;
-        });
-        setErrors(newErrors);
-      }
-      return false;
-    }
-  };
+  const watchIsUrgent = watch("isUrgent");
 
-  // Handle company logo upload
-  const handleImageUpload = (info) => {
-    if (info.file.status === "done") {
-      setImageUrl(
-        info.file.response.url || URL.createObjectURL(info.file.originFileObj)
-      );
-      message.success(`${info.file.name} uploaded successfully`);
-    } else if (info.file.status === "error") {
-      message.error(`${info.file.name} upload failed.`);
-    }
-  };
-
-  const handleSubmit = async (values) => {
-    try {
-      if (!validateFormWithZod(values)) {
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        alert("Chỉ có thể tải lên hình ảnh!");
         return;
       }
 
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      if (!isLt2M) {
+        alert("Hình ảnh phải nhỏ hơn 2MB!");
+        return;
+      }
+
+      setImageUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const onSubmit = async (data) => {
+    try {
       setLoading(true);
-
-      const apiBody = {
-        title: values.title,
-        position: values.position,
-        requirement: values.requirement,
-        description: values.description,
-        jobDetails: values.jobDetails,
-        requirements: values.requirements,
-        experience: values.experience,
-        benefits: values.benefits,
-        salary: values.salary,
-        categoryId: values.categoryId,
-        contactPhone: values.contactPhone,
-        isUrgent: values.isUrgent || false,
+      const formData = {
+        ...data,
+        salary: Number(data.salary),
       };
-
-      await addJobApi(apiBody);
-
-      message.success("Bài đăng tuyển dụng đã được tạo thành công!");
-      form.resetFields();
-      setImageUrl(null);
-      setLoading(false);
-      setIsShowNotification(true);
+      const res = await createjobApi(formData);
+      if (res) {
+        reset();
+        setImageUrl(null);
+        setLoading(false);
+        setIsShowNotification(true);
+      }
     } catch (error) {
       console.error("Error submitting form:", error);
-      message.error("Có lỗi xảy ra khi tạo bài đăng. Vui lòng thử lại.");
+      message.warning("Cần tạo thông tin công ty trước khi  đăng bài");
       setIsShowNotification(false);
     } finally {
       setLoading(false);
     }
   };
-
-  // Image upload props configuration
-  const imageUploadProps = {
-    name: "companyLogo",
-    showUploadList: false,
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith("image/");
-      if (!isImage) {
-        message.error("Chỉ có thể tải lên hình ảnh!");
-        return Upload.LIST_IGNORE;
-      }
-
-      const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isLt2M) {
-        message.error("Hình ảnh phải nhỏ hơn 2MB!");
-        return Upload.LIST_IGNORE;
-      }
-
-      setImageUrl(URL.createObjectURL(file));
-      return false;
-    },
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-cover bg-center bg-no-repeat relative">
-      <div 
-        className="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.7)] to-[rgba(0,0,0,0.5)]"
-        style={{
-          backgroundImage: `url(${createprofilebg})`,
-          backgroundBlendMode: 'overlay',
-        }}
-      />
-      
+    <div
+      className="flex justify-center items-center min-h-screen bg-cover bg-center bg-no-repeat relative pb-20"
+      style={{
+        backgroundImage: `url(${createprofilebg})`,
+      }}
+    >
+      <div className="absolute inset-0 bg-[rgba(0,0,0,.2)] bg-opacity-40" />
       {!isShowNotification ? (
-        <div className="w-full max-w-4xl p-8 bg-[rgba(0,0,0,0.75)] backdrop-blur-sm z-10 m-4 rounded-lg shadow-2xl">
-          <h1 className="text-center text-white text-3xl font-bold mb-10">
+        <div className="w-full max-w-4xl p-6 bg-[rgba(0,0,0,.8)] bg-opacity-60 z-10 mt-6 rounded-lg">
+          <h1 className="text-center text-white text-3xl font-bold mb-8">
             TẠO BÀI ĐĂNG TUYỂN DỤNG
           </h1>
 
-          <div className="flex flex-col md:flex-row gap-8">
-            {/* Left side - Upload company logo */}
-            {/* <div className="w-full md:w-1/4 flex flex-col items-center">
-              <Upload {...imageUploadProps} onChange={handleImageUpload}>
-                <div
-                  className="w-full aspect-square max-w-[200px] bg-[rgba(255,255,255,0.1)] flex flex-col items-center justify-center rounded-lg cursor-pointer hover:bg-[rgba(255,255,255,0.15)] transition-all duration-300 border-2 border-dashed border-gray-400"
-                  style={
-                    imageUrl
-                      ? {
-                          backgroundImage: `url(${imageUrl})`,
-                          backgroundSize: "cover",
-                          backgroundPosition: "center",
-                        }
-                      : {}
-                  }
-                >
-                  {!imageUrl && (
-                    <>
-                      <UserOutlined className="text-4xl text-gray-300" />
-                      <p className="text-gray-300 text-sm mt-2">Logo công ty</p>
-                      <p className="text-gray-400 text-xs mt-1">Nhấn để tải lên</p>
-                    </>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="w-full">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <input
+                    {...register("title")}
+                    type="text"
+                    placeholder="Tiêu đề bài đăng"
+                    className="w-full h-10 px-3 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded focus:outline-none focus:border-blue-500"
+                  />
+                  {errors.title && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.title.message}
+                    </p>
                   )}
                 </div>
-              </Upload>
-            </div> */}
 
-            {/* Right side - Form */}
-            <div className="w-full md:w-4/4">
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={handleSubmit}
-                validateTrigger="onBlur"
-                initialValues={{ isUrgent: false }}
-                className="space-y-6"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Form.Item
-                    name="title"
-                    validateStatus={errors.title ? "error" : ""}
-                    help={errors.title}
-                    label={<span className="text-white">Tiêu đề</span>}
-                  >
-                    <Input
-                      placeholder="Tiêu đề"
-                      className="h-11 !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300"
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="position"
-                    validateStatus={errors.position ? "error" : ""}
-                    help={errors.position}
-                    label={<span className="text-white">Vị trí tuyển dụng</span>}
-                  >
-                    <Input
-                      placeholder="Vị trí tuyển dụng"
-                      className="h-11 !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300"
-                    />
-                  </Form.Item>
+                <div>
+                  <input
+                    {...register("position")}
+                    type="text"
+                    placeholder="Vị trí tuyển dụng"
+                    className="w-full h-10 px-3 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded focus:outline-none focus:border-blue-500"
+                  />
+                  {errors.position && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.position.message}
+                    </p>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Form.Item
-                    name="categoryId"
-                    validateStatus={errors.categoryId ? "error" : ""}
-                    help={errors.categoryId}
-                    label={<span className="text-white">Danh mục</span>}
+                {/* Category */}
+                <div>
+                  <select
+                    {...register("categoryId")}
+                    className="w-full h-10 px-3 border border-gray-500 bg-transparent text-white rounded focus:outline-none focus:border-blue-500"
                   >
-                    <Select
-                      placeholder="Chọn danh mục"
-                      className="category-select h-11"
-                      loading={loadingCategories}
-                      disabled={loadingCategories}
-                      dropdownStyle={{
-                        background: '#1f2937',
-                        borderColor: '#374151'
-                      }}
-                    >
-                      {Array.isArray(categories) && categories.map((category) => (
-                        <Select.Option 
-                          key={category.categoryId} 
+                    <option value="" className="text-black">
+                      Chọn danh mục
+                    </option>
+                    {allCategory &&
+                      allCategory.length > 0 &&
+                      allCategory.map((category) => (
+                        <option
+                          key={category.categoryId}
                           value={category.categoryId}
+                          className="text-black"
                         >
-                          <div className="flex flex-col py-1">
-                            <span className="text-white text-base">{category.title}</span>
-                            <span className="text-gray-400 text-xs mt-1">{category.subItems}</span>
-                          </div>
-                        </Select.Option>
+                          {category.title}
+                        </option>
                       ))}
-                    </Select>
-                  </Form.Item>
-
-                  <Form.Item
-                    name="salary"
-                    validateStatus={errors.salary ? "error" : ""}
-                    help={errors.salary}
-                    label={<span className="text-white">Lương (VNĐ)</span>}
-                  >
-                    <InputNumber
-                      placeholder="Nhập mức lương"
-                      className="h-11 w-full !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white"
-                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                      parser={(value) => value.replace(/\$\s?|(,*)/g, '')}
-                      min={0}
-                    />
-                  </Form.Item>
+                  </select>
+                  {errors.categoryId && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.categoryId.message}
+                    </p>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Form.Item
-                    name="contactPhone"
-                    validateStatus={errors.contactPhone ? "error" : ""}
-                    help={errors.contactPhone}
-                    label={<span className="text-white">Số điện thoại liên hệ</span>}
-                  >
-                    <Input
-                      placeholder="Số điện thoại liên hệ"
-                      className="h-11 !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300"
-                    />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="experience"
-                    validateStatus={errors.experience ? "error" : ""}
-                    help={errors.experience}
-                    label={<span className="text-white">Kinh nghiệm yêu cầu</span>}
-                  >
-                    <Input
-                      placeholder="Kinh nghiệm yêu cầu"
-                      className="h-11 !bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300"
-                    />
-                  </Form.Item>
+                {/* Salary */}
+                <div>
+                  <input
+                    {...register("salary", { valueAsNumber: true })}
+                    type="number"
+                    placeholder="Mức lương (VNĐ)"
+                    className="w-full h-10 px-3 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded focus:outline-none focus:border-blue-500"
+                  />
+                  {errors.salary && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.salary.message}
+                    </p>
+                  )}
                 </div>
 
-                <Form.Item
-                  name="requirement"
-                  validateStatus={errors.requirement ? "error" : ""}
-                  help={errors.requirement}
-                  label={<span className="text-white">Yêu cầu cơ bản</span>}
-                >
-                  <Input.TextArea
-                    placeholder="Yêu cầu cơ bản"
-                    rows={4}
-                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
+                {/* Contact Phone */}
+                <div>
+                  <input
+                    {...register("contactPhone")}
+                    type="text"
+                    placeholder="Số điện thoại liên hệ"
+                    className="w-full h-10 px-3 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded focus:outline-none focus:border-blue-500"
                   />
-                </Form.Item>
+                  {errors.contactPhone && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.contactPhone.message}
+                    </p>
+                  )}
+                </div>
 
-                <Form.Item
-                  name="requirements"
-                  validateStatus={errors.requirements ? "error" : ""}
-                  help={errors.requirements}
-                  label={<span className="text-white">Yêu cầu công việc chi tiết</span>}
-                >
-                  <Input.TextArea
-                    placeholder="Yêu cầu công việc chi tiết"
-                    rows={4}
-                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
+                {/* Requirement */}
+                <div>
+                  <input
+                    {...register("requirement")}
+                    type="text"
+                    placeholder="Yêu cầu tổng quát"
+                    className="w-full h-10 px-3 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded focus:outline-none focus:border-blue-500"
                   />
-                </Form.Item>
+                  {errors.requirement && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.requirement.message}
+                    </p>
+                  )}
+                </div>
 
-                <Form.Item
-                  name="description"
-                  validateStatus={errors.description ? "error" : ""}
-                  help={errors.description}
-                  label={<span className="text-white">Mô tả công việc</span>}
-                >
-                  <Input.TextArea
+                {/* Experience */}
+                <div>
+                  <input
+                    {...register("experience")}
+                    type="text"
+                    placeholder="Yêu cầu kinh nghiệm"
+                    className="w-full h-10 px-3 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded focus:outline-none focus:border-blue-500"
+                  />
+                  {errors.experience && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.experience.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Description */}
+                <div>
+                  <textarea
+                    {...register("description")}
                     placeholder="Mô tả công việc"
                     rows={4}
-                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
+                    className="w-full px-3 py-2 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded resize-none focus:outline-none focus:border-blue-500"
                   />
-                </Form.Item>
-
-                <Form.Item
-                  name="jobDetails"
-                  validateStatus={errors.jobDetails ? "error" : ""}
-                  help={errors.jobDetails}
-                  label={<span className="text-white">Chi tiết công việc</span>}
-                >
-                  <Input.TextArea
-                    placeholder="Chi tiết công việc"
-                    rows={4}
-                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  name="benefits"
-                  validateStatus={errors.benefits ? "error" : ""}
-                  help={errors.benefits}
-                  label={<span className="text-white">Quyền lợi</span>}
-                >
-                  <Input.TextArea
-                    placeholder="Quyền lợi"
-                    rows={4}
-                    className="!bg-[rgba(255,255,255,0.1)] hover:!bg-[rgba(255,255,255,0.15)] focus:!bg-[rgba(255,255,255,0.15)] !text-white placeholder:!text-gray-400 border border-gray-500 rounded-md transition-all duration-300 resize-none"
-                  />
-                </Form.Item>
-
-                <div className="flex items-center gap-3">
-                  <Form.Item
-                    name="isUrgent"
-                    valuePropName="checked"
-                    className="mb-0"
-                  >
-                    <Switch className="bg-gray-600" />
-                  </Form.Item>
-                  <span className="text-white">Tuyển gấp</span>
+                  {errors.description && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.description.message}
+                    </p>
+                  )}
                 </div>
 
-                <Form.Item className="flex justify-center mb-0">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className="h-12 px-12 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 border-none font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                    loading={loading}
+                {/* Requirements */}
+                <div>
+                  <textarea
+                    {...register("requirements")}
+                    placeholder="Yêu cầu chi tiết"
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded resize-none focus:outline-none focus:border-blue-500"
+                  />
+                  {errors.requirements && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.requirements.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Job Details */}
+                <div>
+                  <textarea
+                    {...register("jobDetails")}
+                    placeholder="Chi tiết công việc"
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded resize-none focus:outline-none focus:border-blue-500"
+                  />
+                  {errors.jobDetails && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.jobDetails.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Benefits */}
+                <div>
+                  <textarea
+                    {...register("benefits")}
+                    placeholder="Quyền lợi"
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-500 bg-transparent text-white placeholder-slate-200 rounded resize-none focus:outline-none focus:border-blue-500"
+                  />
+                  {errors.benefits && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.benefits.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Is Urgent */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    {...register("isUrgent")}
+                    type="checkbox"
+                    id="isUrgent"
+                    className="w-4 h-4 text-red-500 bg-transparent border-gray-500 rounded focus:ring-red-500"
+                  />
+                  <label htmlFor="isUrgent" className="text-white text-sm">
+                    Tuyển gấp
+                  </label>
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex justify-center pt-6">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="h-12 px-8 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-medium rounded transition-colors duration-200"
                   >
-                    ĐĂNG TUYỂN
-                  </Button>
-                </Form.Item>
-              </Form>
+                    {loading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Đang xử lý...</span>
+                      </div>
+                    ) : (
+                      "ĐĂNG TUYỂN"
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
       ) : (
-        <div className="z-10 w-4xl">
+        <div className="z-10 w-full max-w-4xl">
           <NotifyCpn
             status="success"
             title="ĐĂNG TUYỂN THÀNH CÔNG!"
             message="Bài đăng của bạn đã được tạo"
-            buttonText="Xem bài đăng"
+            buttonText="Trở về"
             buttonBgColor="white"
             buttonTextColor="black"
-            onButtonClick={() => navigate("/job-detail/1")}
+            onButtonClick={() => navigate(-1)}
           />
         </div>
       )}
-
-      <style jsx="true">{`
-        .category-select .ant-select-selector {
-          background-color: rgba(255, 255, 255, 0.1) !important;
-          border-color: rgb(107, 114, 128) !important;
-          height: 44px !important;
-          padding: 0 16px !important;
-          color: white !important;
-        }
-        
-        .category-select .ant-select-selection-placeholder {
-          color: rgb(156, 163, 175) !important;
-          line-height: 44px !important;
-        }
-        
-        .category-select .ant-select-selection-item {
-          line-height: 44px !important;
-          color: white !important;
-        }
-        
-        .category-select:hover .ant-select-selector {
-          background-color: rgba(255, 255, 255, 0.15) !important;
-        }
-        
-        .ant-select-dropdown {
-          background-color: rgb(31, 41, 55) !important;
-          border: 1px solid rgb(55, 65, 81) !important;
-        }
-        
-        .ant-select-item {
-          color: white !important;
-        }
-        
-        .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-          background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-          background-color: rgba(255, 255, 255, 0.2) !important;
-        }
-      `}</style>
     </div>
   );
 };

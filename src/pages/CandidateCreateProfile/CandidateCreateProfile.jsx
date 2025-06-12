@@ -33,7 +33,6 @@ const CandidateCreateProfile = () => {
   const navigate = useNavigate();
   const validateFormWithZod = (values) => {
     try {
-      // Transform date format for Zod validation
       const transformedValues = {
         ...values,
         birthDate: values.birthDate ? new Date(values.birthDate) : undefined,

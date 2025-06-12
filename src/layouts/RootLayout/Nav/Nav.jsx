@@ -1,25 +1,55 @@
-import { UserOutlined } from "@ant-design/icons";
+import {
+  BuildFilled,
+  HistoryOutlined,
+  LogoutOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
 import { Dropdown, Menu, message } from "antd";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const navigator = useNavigate();
   const isAuthen = localStorage.getItem("isAuthen") === "true";
-
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const handleMenuClick = ({ key }) => {
     if (key === "profile") {
       navigator("/profile");
+    } else if (key === "payment-history") {
+      navigator("/payment-history");
+    } else if (key === "company") {
+      navigator("/company");
     } else if (key === "logout") {
       localStorage.removeItem("isAuthen");
       message.success("Đăng xuất thành công");
       navigator("/login");
     }
   };
-
+  useEffect(() => {
+    if (isAuthen) {
+      const localUser = localStorage.getItem("userInfo");
+      const localRole = localStorage.getItem("role");
+      if (localUser) setUser(JSON.parse(localUser));
+      if (localRole) setRole(localRole);
+    }
+  }, [isAuthen]);
   const menu = (
     <Menu onClick={handleMenuClick}>
-      <Menu.Item key="profile">Hồ sơ</Menu.Item>
-      <Menu.Item key="logout">Đăng xuất</Menu.Item>
+      <Menu.Item key="profile" icon={<UserOutlined />}>
+        Hồ sơ
+      </Menu.Item>
+      {role === "recruiter" && (
+        <Menu.Item key="company" icon={<BuildFilled />}>
+          Công ty
+        </Menu.Item>
+      )}
+      <Menu.Item key="payment-history" icon={<HistoryOutlined />}>
+        Lịch sử thanh toán
+      </Menu.Item>
+      <Menu.Item key="logout" icon={<LogoutOutlined />}>
+        Đăng xuất
+      </Menu.Item>
     </Menu>
   );
 
@@ -55,9 +85,11 @@ const Navbar = () => {
               placement="bottomRight"
               trigger={["click"]}
             >
-              <div className="flex items-center gap-2 hover:text-gray-400 cursor-pointer">
+              <div className="flex items-center gap-2 hover:text-gray-400 cursor-pointer max-w-[140px]">
                 <UserOutlined className="text-xl" />
-                <span>BHV101</span>
+                <span className="truncate overflow-hidden whitespace-nowrap">
+                  {user?.email || "user"}
+                </span>
               </div>
             </Dropdown>
           </>
@@ -66,7 +98,7 @@ const Navbar = () => {
             <Link to="/login" className="hover:text-gray-400">
               ĐĂNG NHẬP
             </Link>
-            <Link to="/register" className="hover:text-gray-400">
+            <Link to="/role-selection" className="hover:text-gray-400">
               ĐĂNG KÝ
             </Link>
           </>

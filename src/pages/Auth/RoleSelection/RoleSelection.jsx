@@ -2,20 +2,20 @@ import { CloseOutlined } from "@ant-design/icons";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import CardcCrcular from "../../../components/CardcCrcular/CardcCrcular";
+import roleBg_1 from "../../../assets/iamges/roleBg_1.jpg";
+import roleBg_2 from "../../../assets/iamges/roleBg_2.jpg";
 const roles = [
   {
     key: "candidate",
     title: "ỨNG VIÊN",
     bgColor: "#D16853",
-    imgUrl:
-      "https://s3-alpha-sig.figma.com/img/465e/1832/d05fe9bc58aec579dbc285e0a9935ad7?Expires=1746403200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=bqcZtkbJrQJQ1yzU3nlDZFLo4fYnkUT04V1ZmHOSbWBli8nDZF5CQtUDv919dWL6aIj~D5C1W4uPiI1NZHPmMDcUh~s~GbEgGW7HiKRPkN5FPIoMCSLzXjztNXzwa8TMyyN8YaIH7uVaE23s9nY2vm9jnnhRcuzANKSgVnj0BVkrptO1UZX7dKR-sQ0-ixwONV5mgyOYR4e1LhG1EqXeewRVjz9H0JZD5rhIaIkT2jzCfHsXHYVE2tJ1mww5JuQvAVyzh-jZitL-ry0-PEZoEI3-vDUqTI98PesaF14AFO71AjwoclNPfhQ8XkyqbWKHVucvz~~vvvvlSRE405KOVQ__",
+    imgUrl: roleBg_1,
   },
   {
     key: "recruiter",
     title: "NHÀ TUYỂN DỤNG",
     bgColor: "#4AA0B5",
-    imgUrl:
-      "https://s3-alpha-sig.figma.com/img/565b/3af5/ba2d41fe57ee87679333c94a03e5268f?Expires=1746403200&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=FYyU~kdXeyaaMLJwqyLienCAxom6NgsTnI7nQqkm11uNIXyffXgTVCSJTBrHoufSeUp0~Mv~XDi3y2UVYdOGTrKNfCowltYI9EHdrRPRgtAuCz0u9yMtcpp8A4n6VfkGbDHLGIaUWIyRqmn3r2vy-kbw-8SwOHSKb3P07NaG3aSUUDV24gHkLlGCsOX6KrnGPpiFjUNG2Y9ymj1qi6PW7XmqRgZSiKCzvNj096edrUcrr9DgzUs-SG1lzBuD0JRzUIcwwGS6K0qybji~I2l7lYLcKOL-ErRx~CWOpxtR90Az0GNf-VAcebEavY5zC~8GLsiTX7w18cvYkKQTE3Dwrg__",
+    imgUrl: roleBg_2,
   },
 ];
 
@@ -27,9 +27,11 @@ const RoleSelection = () => {
   };
 
   const handleRoleSelect = (role) => {
-    localStorage.setItem("isAuthen", "true");
-    localStorage.setItem("role", role);
-    navigate(`/`);
+    if (role === "candidate") {
+      navigate(`/register`);
+    } else if (role === "recruiter") {
+      navigate("/register-recruiter");
+    }
   };
 
   return (

@@ -1,13 +1,10 @@
 import jobListBackground from "../../assets/iamges/jobListbackground.jpg";
-import { Rate } from "antd";
+import { message, Rate } from "antd";
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ResumeModal from "../../components/Modal/ResumeModal/ResumeModal";
-import {
-  CheckCircleFilled,
-  LeftOutlined,
-  RightOutlined,
-} from "@ant-design/icons";
+import { CheckCircleFilled, RightOutlined } from "@ant-design/icons";
+import { applyApplicationApi } from "../../services/application";
 
 const JobApplication = () => {
   const { id: jobId } = useParams();
@@ -50,16 +47,29 @@ const JobApplication = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      setIsSubmit(true);
-      setErrors({});
-      console.log("Dữ liệu hợp lệ:", formData);
+      try {
+        const res = await applyApplicationApi(
+          {
+            about: formData.about,
+            aboutMe: formData.about,
+          },
+          jobId
+        );
+        if (res) {
+          setIsSubmit(true);
+          setErrors({});
+          message.success("Ứng tuyển thành công");
+        }
+      } catch (error) {
+        message.error("Ứng tuyển thất bại, vui lòng kiểm tra lại thông tin");
+      }
     }
   };
   const handleSelectResume = (selectedResume) => {
