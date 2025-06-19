@@ -31,6 +31,11 @@ import PaymentReturn from "./pages/PaymentPackage/PaymentReturn/PaymentReturn";
 import PaymentHistory from "./pages/PaymentHistory/PaymentHistory";
 import RecruiterRegister from "./pages/Auth/Register/RecruiterRegister";
 import Company from "./pages/Company/Company";
+import ApplicationHistory from "./pages/ApplicationHistory/ApplicationHistory";
+import RecruiterListPost from "./pages/RecruiterListPost/RecruiterListPost";
+import AdminLayout from "./layouts/AdminLayout/AdminLayout";
+import PaymentList from "./pages/Admin/PaymentList/PaymentList";
+import RecruiterJobApplican from "./pages/RecruiterJobApplican/RecruiterJobApplican";
 
 const App = () => {
   const router = createBrowserRouter(
@@ -58,6 +63,8 @@ const App = () => {
           <Route path="/payment-return/:type" element={<PaymentReturn />} />
           <Route path="/payment-history" element={<PaymentHistory />} />
           <Route path="/company" element={<Company />} />
+          <Route path="/application-history" element={<ApplicationHistory />} />
+          <Route path="/job-applican/:id" element={<RecruiterJobApplican />} />
 
           <Route
             path="/candidate-create-profile"
@@ -69,8 +76,12 @@ const App = () => {
             path="/recruiter-create-post"
             element={<RecruiterCreatePost />}
           />
+          <Route path="/recruiter-list-post" element={<RecruiterListPost />} />
           <Route path="/service-packages" element={<ServicePackages />} />
-          <Route path="/payment-backage/:type" element={<PaymentPackage />} />
+          <Route path="/payment-package/:type" element={<PaymentPackage />} />
+        </Route>
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/payment" element={<PaymentList />} />
         </Route>
       </Route>
     )

@@ -293,7 +293,7 @@ const JobList = () => {
                           className="bg-teal-600 text-white border-0 hover:bg-teal-700"
                           onClick={() => navigator(`/job-detail/${job.jobId}`)}
                         >
-                          ỨNG TUYỂN
+                          CHI TIẾT
                         </Button>
                       </div>
                     </div>

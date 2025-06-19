@@ -10,14 +10,15 @@ import { Rate } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getJobByIdApi } from "../../services/job";
+import { getApplicanCountJob } from "../../services/application";
 
 const JobDetail = () => {
   const { id } = useParams();
   const [jobDetail, setJobDetail] = useState(null);
+  const [applicationCount, setApplicationCount] = useState();
   const [loading, setLoading] = useState(true);
   const navigator = useNavigate();
-
-  // Mock data for applications since API doesn't provide this yet
+  const role = localStorage.getItem("role");
   const applications = [
     {
       name: "Nguyễn Trọng A",
@@ -39,7 +40,6 @@ const JobDetail = () => {
     },
   ];
 
-  // Mock timeline data
   const timeline = [
     {
       date: "03 - 07 - 2025",
@@ -77,10 +77,20 @@ const JobDetail = () => {
         setLoading(false);
       }
     };
+    const fetchJobCount = async () => {
+      try {
+        const res = await getApplicanCountJob(id);
+        if (res) {
+          setApplicationCount(res);
+        }
+      } catch (error) {
+        console.error("Error fetching job detail:", error);
+      }
+    };
+    fetchJobCount();
     fetchJobDetail();
   }, [id]);
 
-  // Format posted date
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -144,12 +154,21 @@ const JobDetail = () => {
                 </div>
               )}
             </div>
-            <button
-              onClick={() => navigator(`/job-application/${jobDetail.jobId}`)}
-              className="mt-6 bg-white text-black font-bold text-xl px-10 py-4 cursor-pointer rounded-xl hover:bg-gray-200"
-            >
-              ỨNG TUYỂN
-            </button>
+            {role !== "recruiter" ? (
+              <button
+                onClick={() => navigator(`/job-application/${jobDetail.jobId}`)}
+                className="mt-6 bg-white text-black font-bold text-xl px-10 py-4 cursor-pointer rounded-xl hover:bg-gray-200"
+              >
+                ỨNG TUYỂN
+              </button>
+            ) : (
+              <button
+                onClick={() => navigator(-1)}
+                className="mt-6 bg-white text-black font-bold text-xl px-10 py-4 cursor-pointer rounded-xl hover:bg-gray-200"
+              >
+                TRỞ VỀ
+              </button>
+            )}
           </div>
 
           <div className="space-y-8 mt-12">
@@ -171,6 +190,14 @@ const JobDetail = () => {
               </p>
             </div>
 
+            <div>
+              <h2 className="text-2xl font-bold uppercase border-l-4 pl-2 border-white mb-4">
+                SỐ LƯỢNG ĐÃ ỨNG TUYỂN
+              </h2>
+              <p className="text-sm leading-relaxed text-gray-300">
+                {applicationCount || "Chưa cập nhật"}
+              </p>
+            </div>
             <div>
               <h2 className="text-2xl font-bold uppercase border-l-4 pl-2 border-white mb-4">
                 Thông tin

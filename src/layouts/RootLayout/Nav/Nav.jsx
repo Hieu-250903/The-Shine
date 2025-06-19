@@ -1,10 +1,12 @@
 import {
+  AppleFilled,
   BuildFilled,
   HistoryOutlined,
   LogoutOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Dropdown, Menu, message } from "antd";
+import { Newspaper } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -20,6 +22,10 @@ const Navbar = () => {
       navigator("/payment-history");
     } else if (key === "company") {
       navigator("/company");
+    } else if (key === "application-history") {
+      navigator("/application-history");
+    } else if (key === "recruiter-list-post") {
+      navigator("/recruiter-list-post");
     } else if (key === "logout") {
       localStorage.removeItem("isAuthen");
       message.success("Đăng xuất thành công");
@@ -39,9 +45,18 @@ const Navbar = () => {
       <Menu.Item key="profile" icon={<UserOutlined />}>
         Hồ sơ
       </Menu.Item>
-      {role === "recruiter" && (
-        <Menu.Item key="company" icon={<BuildFilled />}>
-          Công ty
+      {role === "recruiter" ? (
+        <>
+          <Menu.Item key="company" icon={<BuildFilled />}>
+            Công ty
+          </Menu.Item>
+          <Menu.Item key="recruiter-list-post" icon={<Newspaper />}>
+            Bài viết đã đăng
+          </Menu.Item>
+        </>
+      ) : (
+        <Menu.Item key="application-history" icon={<AppleFilled />}>
+          Lịch sử ứng tuyển
         </Menu.Item>
       )}
       <Menu.Item key="payment-history" icon={<HistoryOutlined />}>

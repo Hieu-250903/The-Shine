@@ -10,4 +10,7 @@ const getAllJobApi = async () => {
 const getJobByIdApi = async (id) => {
   return await instance.get(`/Job/${id}`);
 };
-export { createjobApi, getAllJobApi, getJobByIdApi };
+const GetByRecruiterIdApi = async () => {
+  return await instance.get(`/Job/GetByRecruiterId`);
+};
+export { createjobApi, getAllJobApi, getJobByIdApi, GetByRecruiterIdApi };

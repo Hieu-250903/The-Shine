@@ -345,7 +345,7 @@ const RecruiterCreatePost = () => {
             buttonText="Trở về"
             buttonBgColor="white"
             buttonTextColor="black"
-            onButtonClick={() => navigate(-1)}
+            onButtonClick={() => navigate("/recruiter-list-post")}
           />
         </div>
       )}
