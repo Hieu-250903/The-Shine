@@ -76,7 +76,7 @@ const ServicePackages = () => {
     {
       id: 3,
       type: "advanced",
-      name: "recruiter999", // Mã chuẩn hóa
+      name: "recruiter999", 
       title: "GÓI NÂNG CAO",
       subtitle:
         "Dành cho doanh nghiệp lớn, tuyển dụng quy mô rộng cần sự toàn diện",
@@ -108,7 +108,7 @@ const ServicePackages = () => {
     {
       id: 4,
       type: "candidate",
-      name: "candidate22", // Mã chuẩn hóa
+      name: "candidate22",
       title: "GÓI ỨNG VIÊN",
       subtitle: "Dành cho ứng viên muốn tăng cơ hội việc làm và nổi bật hơn",
       originalPrice: "50.000VND",

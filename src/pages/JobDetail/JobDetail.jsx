@@ -4,13 +4,17 @@ import {
   LeftOutlined,
   LikeOutlined,
   StarFilled,
+  StarOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Rate } from "antd";
+import { Input, Button, message } from "antd";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getJobByIdApi } from "../../services/job";
 import { getApplicanCountJob } from "../../services/application";
+import { addRating } from "../../services/rate";
+
+const { TextArea } = Input;
 
 const JobDetail = () => {
   const { id } = useParams();
@@ -19,6 +23,15 @@ const JobDetail = () => {
   const [loading, setLoading] = useState(true);
   const navigator = useNavigate();
   const role = localStorage.getItem("role");
+
+  // State cho form đánh giá
+  const [reviewForm, setReviewForm] = useState({
+    rating1: 0,
+    comment: "",
+    contributedComment: "",
+  });
+  const [submittingReview, setSubmittingReview] = useState(false);
+
   const applications = [
     {
       name: "Nguyễn Trọng A",
@@ -97,6 +110,70 @@ const JobDetail = () => {
     return date.toLocaleDateString("vi-VN");
   };
 
+  const handleStarClick = (rating) => {
+    setReviewForm((prev) => ({
+      ...prev,
+      rating1: rating,
+    }));
+  };
+  const StarRating = ({ rating, onRate }) => {
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => onRate(star)}
+            className="text-2xl hover:scale-110 transition-transform cursor-pointer"
+          >
+            {star <= rating ? (
+              <StarFilled className="text-yellow-400" />
+            ) : (
+              <StarOutlined className="text-white hover:text-yellow-200" />
+            )}
+          </button>
+        ))}
+        <span className="ml-2 text-white text-sm">
+          {rating > 0 ? `${rating}/5 sao` : "Chưa đánh giá"}
+        </span>
+      </div>
+    );
+  };
+
+  const handleReviewChange = (field, value) => {
+    setReviewForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSubmitReview = async () => {
+    if (reviewForm.rating1 === 0) {
+      message.error("Vui lòng chọn số sao đánh giá!");
+      return;
+    }
+
+    if (!reviewForm.comment.trim()) {
+      message.error("Vui lòng nhập nội dung đánh giá!");
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      await addRating(reviewForm);
+      message.success("Đánh giá của bạn đã được gửi thành công!");
+      setReviewForm({
+        rating1: 0,
+        comment: "",
+        contributedComment: "",
+      });
+    } catch (error) {
+      message.error("Có lỗi xảy ra khi gửi đánh giá!");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen text-white">
@@ -141,7 +218,14 @@ const JobDetail = () => {
                 className="rounded-lg object-cover w-[500px] h-[600px]"
               />
               <div className="absolute top-4 right-4 flex flex-col gap-2">
-                <Rate value={4} className="!flex !flex-col !text-3xl" />
+                <div className="flex">
+                  {[1, 2, 3, 4].map((star) => (
+                    <StarFilled
+                      key={star}
+                      className="text-yellow-400 text-3xl"
+                    />
+                  ))}
+                </div>
               </div>
               <div className="text-4xl font-bold uppercase text-center absolute bottom-2 right-1/2 translate-x-[50%]">
                 {jobDetail.companyName || "N/A"}

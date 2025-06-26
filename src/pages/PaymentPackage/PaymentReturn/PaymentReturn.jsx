@@ -1,6 +1,9 @@
-import React from "react";
+import { message } from "antd";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import NotifyCpn from "../../../components/NotifyCpn/NotifyCpn";
+import ReviewModal from "../../../components/ReviewModal/ReviewModal";
+import { addRating, checkRating1 } from "../../../services/rate";
 
 const PaymentReturn = () => {
   const { type } = useParams();
@@ -18,17 +21,67 @@ const PaymentReturn = () => {
     buttonBgColor: isCancel ? "red" : "green",
     buttonTextColor: "white",
   };
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  useEffect(() => {
+    const isAuthen = localStorage.getItem("isAuthen");
+
+    const handleCheckRating = async () => {
+      try {
+        const res = await checkRating1();
+        const hasRated = res || false;
+        if (isAuthen && !hasRated) {
+          setIsReviewModalOpen(true);
+        }
+      } catch (error) {
+        console.error("Error checking rating:", error);
+      }
+    };
+
+    if (isAuthen) {
+      handleCheckRating();
+    }
+  }, []);
+  const handleReviewSubmitted = async (reviewForm) => {
+    console.log("reviewForm", reviewForm);
+    if (reviewForm.rating1 === 0) {
+      message.error("Vui lòng chọn số sao đánh giá!");
+      return;
+    }
+    if (!reviewForm.comment.trim()) {
+      message.error("Vui lòng nhập nội dung đánh giá!");
+      return;
+    }
+    try {
+      await addRating(reviewForm);
+      message.success("Đánh giá của bạn đã được gửi thành công!");
+      setIsReviewModalOpen(false);
+    } catch (error) {
+      message.error("Có lỗi xảy ra khi gửi đánh giá!");
+    } finally {
+      setIsReviewModalOpen(false);
+    }
+  };
+  const handleCloseModal = () => {
+    setIsReviewModalOpen(false);
+  };
 
   return (
-    <NotifyCpn
-      status={config.status}
-      title={config.title}
-      message={config.message}
-      buttonText={config.buttonText}
-      buttonBgColor={config.buttonBgColor}
-      buttonTextColor={config.buttonTextColor}
-      onButtonClick={() => navigate("/")}
-    />
+    <div className="bg-slate-500">
+      <NotifyCpn
+        status={config.status}
+        title={config.title}
+        message={config.message}
+        buttonText={config.buttonText}
+        buttonBgColor={config.buttonBgColor}
+        buttonTextColor={config.buttonTextColor}
+        onButtonClick={() => navigate("/")}
+      />
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={handleCloseModal}
+        onReviewSubmitted={handleReviewSubmitted}
+      />
+    </div>
   );
 };
 

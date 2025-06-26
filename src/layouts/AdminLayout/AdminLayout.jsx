@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import {
   DashboardOutlined,
   TeamOutlined,
@@ -12,10 +12,11 @@ import {
   BellOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
+import { StarIcon } from "lucide-react";
 
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
-
+  const navigate = useNavigate();
   const menuItems = [
     {
       key: "dashboard",
@@ -33,7 +34,13 @@ const AdminLayout = () => {
       key: "payments",
       icon: <CreditCardOutlined />,
       label: "Quản lý thanh toán",
-      path: "/admin/payments",
+      path: "/admin/payment",
+    },
+    {
+      key: "rating",
+      icon: <StarIcon />,
+      label: "Quản lý đánh giá",
+      path: "/admin/rating",
     },
     {
       key: "applications",
@@ -44,11 +51,9 @@ const AdminLayout = () => {
   ];
 
   const handleMenuClick = (path) => {
-    console.log(`Navigate to: ${path}`);
-    // navigate(path); // Uncomment when using react-router-dom
+    navigate(path);
   };
 
-  // Simulate active menu detection (in real app, use useLocation from react-router-dom)
   const isActiveMenu = (path) => {
     // return location.pathname === path || location.pathname.startsWith(path + '/');
     return false;

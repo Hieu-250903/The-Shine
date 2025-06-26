@@ -3,6 +3,7 @@ import {
   BuildFilled,
   HistoryOutlined,
   LogoutOutlined,
+  StarFilled,
   UserOutlined,
 } from "@ant-design/icons";
 import { Dropdown, Menu, message } from "antd";
@@ -26,12 +27,15 @@ const Navbar = () => {
       navigator("/application-history");
     } else if (key === "recruiter-list-post") {
       navigator("/recruiter-list-post");
+    } else if (key === "rating-history") {
+      navigator("/rating-history");
     } else if (key === "logout") {
       localStorage.removeItem("isAuthen");
       message.success("Đăng xuất thành công");
       navigator("/login");
     }
   };
+
   useEffect(() => {
     if (isAuthen) {
       const localUser = localStorage.getItem("userInfo");
@@ -61,6 +65,9 @@ const Navbar = () => {
       )}
       <Menu.Item key="payment-history" icon={<HistoryOutlined />}>
         Lịch sử thanh toán
+      </Menu.Item>
+      <Menu.Item key="rating-history" icon={<StarFilled />}>
+        Lịch sử đánh giá
       </Menu.Item>
       <Menu.Item key="logout" icon={<LogoutOutlined />}>
         Đăng xuất
