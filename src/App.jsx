@@ -37,6 +37,8 @@ import RecruiterJobApplican from "./pages/RecruiterJobApplican/RecruiterJobAppli
 import RecruiterListPost from "./pages/RecruiterListPost/RecruiterListPost";
 import ServicePackages from "./pages/ServicePackages/ServicePackages";
 import RatingList from "./pages/Admin/RatingList/RatingList";
+import RatingPieCharts from "./components/Charts/PieChart";
+import PaymentChart from "./components/Charts/PaymentChart";
 
 const App = () => {
   const router = createBrowserRouter(
@@ -51,6 +53,9 @@ const App = () => {
 
         <Route path="/role-selection" element={<RoleSelection />} />
         <Route path="/cv/:id" element={<CVViewer />} />
+        <Route path="/pie-chart" element={<RatingPieCharts/>} />
+        <Route path="/payment-chart" element={<PaymentChart/>} />
+
 
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />

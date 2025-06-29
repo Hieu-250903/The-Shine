@@ -21,6 +21,12 @@ const checkRating1 = async () => {
 const checkRating2 = async () => {
   return await instance.get("/Rating/check-contributed-2");
 };
+const getPieChart1 = async () => {
+  return await instance.get("/Rating/pie-chart1");
+};
+const getPieChart2 = async () => {
+  return await instance.get("/Rating/pie-chart2");
+};
 export {
   addRating,
   getUserRating,
@@ -29,4 +35,6 @@ export {
   getAllRating,
   checkRating1,
   checkRating2,
+  getPieChart1,
+  getPieChart2,
 };
