@@ -24,12 +24,12 @@ const AdminLayout = () => {
       label: "Dashboard",
       path: "/admin/dashboard",
     },
-    {
-      key: "users",
-      icon: <TeamOutlined />,
-      label: "Quản lý người dùng",
-      path: "/admin/users",
-    },
+    // {
+    //   key: "users",
+    //   icon: <TeamOutlined />,
+    //   label: "Quản lý người dùng",
+    //   path: "/admin/users",
+    // },
     {
       key: "payments",
       icon: <CreditCardOutlined />,
