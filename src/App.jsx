@@ -37,6 +37,7 @@ import RecruiterJobApplican from "./pages/RecruiterJobApplican/RecruiterJobAppli
 import RecruiterListPost from "./pages/RecruiterListPost/RecruiterListPost";
 import ServicePackages from "./pages/ServicePackages/ServicePackages";
 import RatingList from "./pages/Admin/RatingList/RatingList";
+import Dashboard from "./pages/Admin/Dashboard/Dashboard";
 
 const App = () => {
   const router = createBrowserRouter(
@@ -84,6 +85,7 @@ const App = () => {
         <Route element={<AdminLayout />}>
           <Route path="/admin/payment" element={<PaymentList />} />
           <Route path="/admin/rating" element={<RatingList />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
         </Route>
       </Route>
     )
