@@ -14,14 +14,14 @@ const PaymentChart = () => {
   const [error, setError] = useState(null);
   const [filterType, setFilterType] = useState("month");
   const [startMonth, setStartMonth] = useState(1);
-  const [endMonth, setEndMonth] = useState(6);
+  const [endMonth, setEndMonth] = useState(7); // Adjusted to include "2025-07"
   const [startYear, setStartYear] = useState(2025);
   const [endYear, setEndYear] = useState(2025);
   const [startDate, setStartDate] = useState(new Date(2025, 0, 1)); // January 1, 2025
-  const [endDate, setEndDate] = useState(new Date(2025, 5, 1));    // June 1, 2025
+  const [endDate, setEndDate] = useState(new Date(2025, 6, 1));    // July 1, 2025
 
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
-  const years = [2024, 2025, 2026]; // Adjustable range of years
+  const years = [2024, 2025, 2026];
 
   useEffect(() => {
     const fetchChartData = async () => {
@@ -32,28 +32,45 @@ const PaymentChart = () => {
           startMonth: filterType === "day" ? (startDate?.getMonth() + 1 || 1) : startMonth,
           startYear: filterType === "day" ? (startDate?.getFullYear() || 2025) : startYear,
           startDay: filterType === "day" ? (startDate?.getDate() || 1) : 1,
-          endMonth: filterType === "day" ? (endDate?.getMonth() + 1 || 6) : endMonth,
+          endMonth: filterType === "day" ? (endDate?.getMonth() + 1 || 7) : endMonth,
           endYear: filterType === "day" ? (endDate?.getFullYear() || 2025) : endYear,
           endDay: filterType === "day" ? (endDate?.getDate() || 1) : 1,
         };
-        console.log("Chart Params:", chartParams);
+        console.log("Chart Params:", JSON.stringify(chartParams, null, 2));
         const response = await getPaymentChartDataApi(chartParams);
-        console.log("Full Response:", response);
+        console.log("Full API Response:", JSON.stringify(response, null, 2)); // Log full response
 
-        const data = response.data || [];
+        let data = [];
+        if (Array.isArray(response)) {
+          data = response; // Handle plain array response
+        } else if (response && response.data) {
+          data = Array.isArray(response.data) ? response.data : [];
+        } else if (response && response.result) {
+          data = Array.isArray(response.result) ? response.result : [];
+        } else {
+          console.warn("No recognizable data structure in response:", JSON.stringify(response));
+          data = [];
+        }
+
         let completeData = [];
 
         if (filterType === "month") {
-          // Generate complete monthly timeline
           const start = new Date(startYear, startMonth - 1, 1);
           const end = new Date(endYear, endMonth, 0);
           for (let d = new Date(start); d <= end; d.setMonth(d.getMonth() + 1)) {
             const time = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            const item = data.find((item) => item.time === time) || { time, totalAmount: 0 };
+            let item;
+            const exactMatch = data.find((item) => item.time === time);
+            if (exactMatch) {
+              console.log(`Matched ${time} with ${JSON.stringify(exactMatch)}`);
+              item = exactMatch;
+            } else {
+              console.log(`No exact match for ${time}, defaulting to { time, totalAmount: 0 }`);
+              item = { time, totalAmount: 0 };
+            }
             completeData.push(item);
           }
         } else {
-          // Generate complete daily timeline
           for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
             const time = d.toISOString().split('T')[0];
             const item = data.find((item) => item.time === time) || { time, totalAmount: 0 };
@@ -61,6 +78,7 @@ const PaymentChart = () => {
           }
         }
 
+        console.log("Complete Data:", JSON.stringify(completeData, null, 2)); // Debug: Log complete data
         setChartData({
           labels: completeData.map((item) => item.time),
           datasets: [
@@ -74,14 +92,9 @@ const PaymentChart = () => {
             },
           ],
         });
+        console.log("Chart Data:", JSON.stringify(chartData, null, 2)); // Debug: Log chart data
       } catch (error) {
-        if (error.response) {
-          console.error("Server responded with error:", error.response.status, error.response.data);
-        } else if (error.request) {
-          console.error("No response received:", error.request);
-        } else {
-          console.error("Error setting up request:", error.message);
-        }
+        console.error("API Error:", error.response ? error.response : error.message);
         setError("Không thể tải dữ liệu biểu đồ thanh toán!");
       } finally {
         setLoading(false);
@@ -90,6 +103,9 @@ const PaymentChart = () => {
 
     fetchChartData();
   }, [filterType, startMonth, endMonth, startYear, endYear, startDate, endDate]);
+
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
 
   const chartOptions = {
     responsive: true,
@@ -105,7 +121,10 @@ const PaymentChart = () => {
       },
       tooltip: {
         callbacks: {
-          label: (context) => `${context.dataset.label}: ${context.parsed.y}`,
+          label: (context) => {
+            console.log("Tooltip Parsed Value:", context.parsed.y);
+            return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
+          },
         },
       },
     },
@@ -115,8 +134,12 @@ const PaymentChart = () => {
         ticks: { color: "#fff" },
       },
       y: {
-        title: { display: true, text: "Tổng số tiền", color: "#fff" },
-        ticks: { color: "#fff", beginAtZero: true },
+        title: { display: true, text: "Tổng số tiền (VND)", color: "#fff" },
+        ticks: {
+          color: "#fff",
+          beginAtZero: true,
+          callback: (value) => formatCurrency(value),
+        },
       },
     },
   };
