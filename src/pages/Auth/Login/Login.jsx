@@ -9,7 +9,7 @@ import { loginApi } from "../../../services/auth";
 import { jwtDecode } from "jwt-decode";
 const loginSchema = z.object({
   email: z.string().email({ message: "Email không hợp lệ" }),
-  password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
+  password: z.string().min(4, { message: "Mật khẩu phải có ít nhất 6 ký tự" }),
   rememberMe: z.boolean().optional(),
 });
 
@@ -51,9 +51,15 @@ const LoginScreen = () => {
         localStorage.setItem("userInfo", JSON.stringify({ ...formData, id }));
         localStorage.setItem(
           "role",
-          role === "Candidate" ? "candidate" : "recruiter"
+          role === "Candidate"
+            ? "candidate"
+            : role === "Admin"
+            ? "admin"
+            : "recruiter"
         );
-        navigate("/");
+        if (role === "Admin") {
+          navigate("/admin/dashboard");
+        } else navigate("/");
       } else {
         message.error("Thông tin tài khoản và mật khẩu không chính xác");
       }
