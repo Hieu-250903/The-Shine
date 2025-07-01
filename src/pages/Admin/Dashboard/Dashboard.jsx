@@ -8,7 +8,8 @@ import {
   FileTextOutlined,
   CalendarOutlined,
 } from "@ant-design/icons";
-
+import PaymentChart from "../../../components/Charts/PaymentChart";
+import RatingPieCharts from "../../../components/Charts/PieChart";
 const Dashboard = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -123,6 +124,8 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+        <PaymentChart />
+        <RatingPieCharts />
       </div>
     </div>
   );

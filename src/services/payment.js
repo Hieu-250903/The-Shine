@@ -9,4 +9,7 @@ const getPaymentOrderCodeApi = async (orderCode) => {
 const getPaymentApi = async () => {
   return await instance.get("/payment");
 };
-export { createPaymentApi, getPaymentApi, getPaymentOrderCodeApi };
+const getPaymentChartDataApi = async (chartData) => {
+  return await instance.post("/Payment/paymentChartData", chartData);
+};
+export { createPaymentApi, getPaymentApi, getPaymentOrderCodeApi, getPaymentChartDataApi };
