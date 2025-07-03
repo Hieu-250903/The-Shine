@@ -32,50 +32,6 @@ const JobDetail = () => {
   });
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  const applications = [
-    {
-      name: "Nguyễn Trọng A",
-      rating: 4,
-      comment: "Rất tốt",
-      date: "03 - 07 - 2025",
-    },
-    {
-      name: "Hồ Tấn B",
-      rating: 3,
-      comment: "Tạm được",
-      date: "26 - 03 - 2025",
-    },
-    {
-      name: "Nguyễn Ngọc C",
-      rating: 5,
-      comment: "Tuyệt",
-      date: "04 - 01 - 2025",
-    },
-  ];
-
-  const timeline = [
-    {
-      date: "03 - 07 - 2025",
-      content: "Được tuyển thành nhân viên hỗ trợ sự kiện tại Công ty X.",
-    },
-    {
-      date: "12 - 06 - 2025",
-      content: "Được book làm thiết kế poster quảng cáo cho Nhà hàng Y.",
-    },
-    {
-      date: "26 - 05 - 2025",
-      content: "Tham gia dự án xây dựng hệ thống ngân hàng tại Công ty Z.",
-    },
-    {
-      date: "13 - 04 - 2025",
-      content: "Hoàn thành chuyên đề phát triển sản phẩm cho Cửa hàng A.",
-    },
-    {
-      date: "10 - 02 - 2025",
-      content: "Được tuyển dụng làm trợ lý bán hàng theo ca tại Shop B.",
-    },
-  ];
-
   useEffect(() => {
     const fetchJobDetail = async () => {
       setLoading(true);
@@ -349,79 +305,6 @@ const JobDetail = () => {
                 >
                   CHI TIẾT CÔNG VIỆC
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Application History */}
-        <div className="mt-12 bg-[rgba(0,0,0,.6)] p-6 mx-auto max-w-[75%]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="space-y-6">
-              {applications.length > 0 ? (
-                applications.map((item, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="bg-gray-800 p-3 rounded-full">
-                      <UserOutlined className="text-xl" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold">{item.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2 my-1">
-                        <div className="flex">
-                          {[...Array(item.rating)].map((_, idx) => (
-                            <StarFilled
-                              key={idx}
-                              className="text-yellow-400 text-sm"
-                            />
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-400">
-                          {item.date}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-300">{item.comment}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <button className="bg-white px-1 rounded-full w-6 cursor-pointer hover:bg-gray-200">
-                          <LikeOutlined color="black" className="!text-black" />
-                        </button>
-                        <button className="bg-white px-1 rounded-full w-6 cursor-pointer hover:bg-gray-200">
-                          <CommentOutlined
-                            color="black"
-                            className="!text-black"
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center text-gray-400">
-                  <p>Chưa có đánh giá nào</p>
-                </div>
-              )}
-            </div>
-
-            <div className="relative">
-              <span className="text-center text-2xl block absolute -top-10 left-1/2 transform -translate-x-1/2 bg-[rgba(0,0,0,.7)] text-white font-bold py-2 px-4 rounded-md">
-                LỊCH SỬ ỨNG TUYỂN
-              </span>
-              <div className="absolute left-4 top-0 bottom-0 w-[2px] bg-gray-500"></div>
-              <div className="space-y-10 pl-10">
-                {timeline.length > 0 ? (
-                  timeline.map((item, index) => (
-                    <div key={index} className="relative">
-                      <div className="absolute -left-8 top-1 w-4 h-4 bg-white rounded-full"></div>
-                      <p className="text-white font-medium">{item.date}</p>
-                      <p className="text-sm text-gray-400">{item.content}</p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center text-gray-400">
-                    <p>Chưa có lịch sử ứng tuyển</p>
-                  </div>
-                )}
               </div>
             </div>
           </div>

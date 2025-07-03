@@ -13,7 +13,7 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { StarIcon } from "lucide-react";
-
+import Cookie from "js-cookie";
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
@@ -58,7 +58,12 @@ const AdminLayout = () => {
     // return location.pathname === path || location.pathname.startsWith(path + '/');
     return false;
   };
-
+  const handleLogout = () => {
+    localStorage.clear();
+    Cookie.remove("accessToken");
+    Cookie.remove("refreshToken");
+    navigate("/login");
+  };
   return (
     <div className="min-h-screen bg-gray-900 flex">
       <div
@@ -134,6 +139,7 @@ const AdminLayout = () => {
           </button>
 
           <button
+            onClick={handleLogout}
             className={`w-full flex items-center px-3 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-all duration-200 group relative mt-1`}
           >
             <span className={`text-lg ${collapsed ? "mx-auto" : "mr-3"}`}>

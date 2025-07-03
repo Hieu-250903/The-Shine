@@ -94,51 +94,8 @@ const JobApplication = () => {
                 ĐƠN ỨNG TUYỂN
               </div>
 
-              <div className="flex items-start gap-6 w-5xl">
-                <div className="flex items-start">
-                  <div className="relative">
-                    <img
-                      src="https://i.pinimg.com/736x/5a/89/6d/5a896d18e2916972896bca216120bc38.jpg"
-                      alt="TLC Corp"
-                      className="rounded-lg object-cover w-full h-[500px]"
-                    />
-                    <div className="absolute top-4 right-4 flex flex-col gap-2">
-                      <Rate value={4} className="!flex !flex-col !text-3xl" />
-                    </div>
-                    <div className="text-4xl font-bold uppercase text-center absolute bottom-2 right-1/2 translate-x-[50%] text-white">
-                      TLC Corp
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-8 bg-[rgba(0,0,0,.6)] p-5 w-3xl">
-                  {selectedResume ? (
-                    <div className="flex">
-                      <img
-                        src={selectedResume.imgUrl}
-                        className="w-40 h-72 object-cover"
-                      />
-                      <div className="flex flex-col items-center gap-2 flex-1 justify-center">
-                        <span className="text-white font-bold text-2xl">
-                          {selectedResume.desc}
-                        </span>
-                        <div className="flex items-center gap-2 text-white mt-4">
-                          <span>Upload thành công</span>
-                          <CheckCircleFilled className="!text-green-500" />
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div
-                      onClick={() => setOpenModal(true)}
-                      className="flex border border-white rounded-md h-40 items-center justify-center"
-                    >
-                      <label className="block mb-2 font-bold text-black bg-white px-10 py-2 rounded-full cursor-pointer hover:bg-gray-200">
-                        Gửi hồ sơ
-                      </label>
-                    </div>
-                  )}
-
+              <div className="flex items-center justify-center gap-6 w-5xl">
+                <div className="bg-[rgba(0,0,0,.6)] p-5 w-3xl">
                   <div>
                     <label className="block mb-2 font-medium text-white">
                       Lời nhắn đến nhà tuyển dụng

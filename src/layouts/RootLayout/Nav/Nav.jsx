@@ -81,12 +81,16 @@ const Navbar = () => {
         <Link to="/about" className="hover:text-gray-400">
           THE SHINE
         </Link>
-        <Link to="/recruiter-create-post" className="hover:text-gray-400">
-          ĐĂNG TUYỂN
-        </Link>
-        <Link to="/candidate-list" className="hover:text-gray-400">
-          ỨNG VIÊN
-        </Link>
+        {role === "recruiter" ? (
+          <>
+            <Link to="/recruiter-create-post" className="hover:text-gray-400">
+              ĐĂNG TUYỂN
+            </Link>
+            <Link to="/candidate-list" className="hover:text-gray-400">
+              ỨNG VIÊN
+            </Link>
+          </>
+        ) : null}
       </div>
 
       <div
@@ -120,7 +124,7 @@ const Navbar = () => {
             <Link to="/login" className="hover:text-gray-400">
               ĐĂNG NHẬP
             </Link>
-            <Link to="/role-selection" className="hover:text-gray-400">
+            <Link to="/register" className="hover:text-gray-400">
               ĐĂNG KÝ
             </Link>
           </>

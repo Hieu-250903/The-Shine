@@ -14,11 +14,12 @@ import { useNavigate } from "react-router-dom";
 const ServicePackages = () => {
   const [loadingPackage, setLoadingPackage] = useState(null);
   const navigate = useNavigate();
+  const localRole = localStorage.getItem("role");
   const packages = [
     {
       id: 1,
       type: "basic",
-      name: "recruiter299", // Mã chuẩn hóa
+      name: "recruiter299",
       title: "GÓI CƠ BẢN",
       subtitle: "Dành cho doanh nghiệp nhỏ hoặc cá nhân tuyển dụng số lượng ít",
       originalPrice: "350.000VND",
@@ -45,7 +46,7 @@ const ServicePackages = () => {
     {
       id: 2,
       type: "normal",
-      name: "recruiter599", // Mã chuẩn hóa
+      name: "recruiter599",
       title: "GÓI THƯỜNG",
       subtitle:
         "Dành cho doanh nghiệp đang mở rộng tuyển dụng, cần hiệu suất cao hơn",
@@ -76,7 +77,7 @@ const ServicePackages = () => {
     {
       id: 3,
       type: "advanced",
-      name: "recruiter999", 
+      name: "recruiter999",
       title: "GÓI NÂNG CAO",
       subtitle:
         "Dành cho doanh nghiệp lớn, tuyển dụng quy mô rộng cần sự toàn diện",
@@ -137,7 +138,7 @@ const ServicePackages = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      navigate(`/payment-package/${pkg.name}`);
+      navigate(`/payment-package/${pkg.type}`);
     } catch (error) {
       console.error("Error initiating payment:", error);
     } finally {
@@ -200,18 +201,16 @@ const ServicePackages = () => {
         </div>
       </div>
 
-      {/* Package Categories */}
       <div className="w-full max-w-7xl mb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Recruiter Packages */}
-          <div className="lg:col-span-3">
-            <div className="flex items-center gap-3 mb-6">
+        {localRole === "recruiter" ? (
+          <div>
+            <div className="flex items-center justify-center gap-3 mb-6">
               <BankOutlined className="text-2xl text-blue-400" />
               <h2 className="text-2xl font-bold text-white">
                 Gói Nhà Tuyển Dụng
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex flex-wrap justify-center gap-6">
               {packages
                 .filter((pkg) => pkg.category === "recruiter bundle")
                 .map((pkg) => (
@@ -219,7 +218,7 @@ const ServicePackages = () => {
                     key={pkg.id}
                     className={`relative bg-gray-800 border-2 ${
                       pkg.borderClass
-                    } rounded-2xl p-6 text-white flex flex-col transition-all duration-300 hover:scale-105 hover:shadow-2xl ${
+                    } rounded-2xl p-6 text-white flex flex-col transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm ${
                       pkg.popular ? "ring-2 ring-blue-400 ring-opacity-50" : ""
                     }`}
                   >
@@ -289,19 +288,14 @@ const ServicePackages = () => {
                 ))}
             </div>
           </div>
-
-          {/* Candidate Package */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-3 mb-6">
-              <UserOutlined className="text-2xl text-purple-400" />
-              <h2 className="text-xl font-bold text-white">Gói Ứng Viên</h2>
-            </div>
+        ) : (
+          <div className="flex justify-center items-center w-full">
             {packages
               .filter((pkg) => pkg.category === "candidate bundle")
               .map((pkg) => (
                 <div
                   key={pkg.id}
-                  className={`bg-gray-800 border-2 ${pkg.borderClass} rounded-2xl p-6 text-white flex flex-col transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
+                  className={`bg-gray-800 border-2 ${pkg.borderClass} rounded-2xl p-6 text-white flex flex-col transition-all duration-300 hover:scale-105 hover:shadow-2xl w-full max-w-sm`}
                 >
                   <div className="text-center mb-6">
                     <h3
@@ -359,15 +353,15 @@ const ServicePackages = () => {
                 </div>
               ))}
           </div>
-        </div>
+        )}
       </div>
 
       <div className="w-full max-w-4xl bg-gray-800 border border-gray-700 rounded-2xl p-6 mb-8">
         <h3 className="text-xl font-bold text-white mb-4 text-center">
           Thông tin thanh toán và hỗ trợ
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-          <div>
+        <div className="flex flex-wrap justify-center gap-6 text-center">
+          <div className="flex-1 min-w-[200px]">
             <CreditCardOutlined className="text-3xl text-green-400 mb-2" />
             <h4 className="font-semibold text-white mb-1">
               Thanh toán an toàn
@@ -376,14 +370,14 @@ const ServicePackages = () => {
               Hỗ trợ thẻ tín dụng, chuyển khoản, ví điện tử
             </p>
           </div>
-          <div>
+          <div className="flex-1 min-w-[200px]">
             <BankOutlined className="text-3xl text-blue-400 mb-2" />
             <h4 className="font-semibold text-white mb-1">Xử lý tức thì</h4>
             <p className="text-gray-400 text-sm">
               Gói dịch vụ được kích hoạt ngay sau thanh toán
             </p>
           </div>
-          <div>
+          <div className="flex-1 min-w-[200px]">
             <UserOutlined className="text-3xl text-purple-400 mb-2" />
             <h4 className="font-semibold text-white mb-1">Hỗ trợ 24/7</h4>
             <p className="text-gray-400 text-sm">

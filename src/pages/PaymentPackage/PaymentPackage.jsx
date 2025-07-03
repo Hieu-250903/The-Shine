@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ArrowLeftOutlined,
   CheckOutlined,
@@ -9,12 +9,14 @@ import {
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import { createPaymentApi } from "../../services/payment";
+import { useNavigate, useParams } from "react-router-dom";
 
 // Cập nhật thông tin gói từ ServicePackages
 const packageData = {
   // Gói recruiter
   basic: {
     id: 1,
+    role: "recruiter",
     name: "recruiter299",
     title: "GÓI CƠ BẢN",
     subtitle: "Dành cho doanh nghiệp nhỏ hoặc cá nhân tuyển dụng số lượng ít",
@@ -36,6 +38,7 @@ const packageData = {
   },
   normal: {
     id: 2,
+    role: "recruiter",
     name: "recruiter599",
     title: "GÓI THƯỜNG",
     subtitle:
@@ -58,6 +61,7 @@ const packageData = {
   },
   advanced: {
     id: 3,
+    role: "recruiter",
     name: "recruiter999",
     title: "GÓI NÂNG CAO",
     subtitle:
@@ -81,6 +85,7 @@ const packageData = {
   },
   candidate: {
     id: 4,
+    role: "candidate",
     name: "candidate22",
     title: "GÓI ỨNG VIÊN",
     subtitle: "Dành cho ứng viên muốn tăng cơ hội việc làm và nổi bật hơn",
@@ -106,12 +111,13 @@ const PaymentPackage = () => {
   const [selectedPackage, setSelectedPackage] = useState("basic");
   const [isPayment, setIsPayment] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const localRole = localStorage.getItem("role");
   const data = packageData[selectedPackage];
-
-  const navigate = (path) => {
-    console.log(`Navigating to: ${path}`);
-  };
+  const { type } = useParams();
+  useEffect(() => {
+    if (type) setSelectedPackage(type);
+  }, [type]);
+  const navigate = useNavigate();
 
   if (!data) {
     return (
@@ -203,26 +209,6 @@ const PaymentPackage = () => {
             <h1 className="text-4xl font-bold text-center mb-4">
               XÁC NHẬN MUA GÓI DỊCH VỤ
             </h1>
-
-            {/* Package Selector */}
-            <div className="flex justify-center gap-4 mb-8">
-              {Object.entries(packageData).map(([key, pkg]) => (
-                <button
-                  key={key}
-                  onClick={() => setSelectedPackage(key)}
-                  className={`px-4 py-2 rounded-lg transition-all ${
-                    selectedPackage === key
-                      ? `bg-gradient-to-r ${pkg.buttonColor.replace(
-                          "hover:",
-                          ""
-                        )} text-white`
-                      : "bg-gray-700 hover:bg-gray-600 text-gray-300"
-                  }`}
-                >
-                  {pkg.title}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Main Content */}
