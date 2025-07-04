@@ -1,4 +1,4 @@
-import { CloseOutlined, GoogleOutlined } from "@ant-design/icons";
+import { CloseOutlined, GoogleOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, message } from "antd";
 import Cookie from "js-cookie";
 import { useState } from "react";
@@ -21,6 +21,8 @@ const LoginScreen = () => {
     rememberMe: false,
   });
   const [errors, setErrors] = useState({});
+  // Đã bỏ show/hide email
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
@@ -127,15 +129,23 @@ const LoginScreen = () => {
                           )}
                         </div>
 
-                        <div className="mb-6">
+                        <div className="mb-6 relative">
                           <input
                             name="password"
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             placeholder="Mật khẩu"
-                            className="w-full p-2 mb-2 bg-transparent border-b border-gray-400 text-white outline-none"
+                            className="w-full p-2 mb-2 bg-transparent border-b border-gray-400 text-white outline-none pr-8"
                             value={formData.password}
                             onChange={handleChange}
                           />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            className="absolute right-2 top-2 text-gray-400 hover:text-white"
+                            tabIndex={-1}
+                          >
+                            {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                          </button>
                           {errors.password && (
                             <p className="text-red-500 text-sm">
                               {errors.password}

@@ -38,6 +38,7 @@ export default function RecruiterRegister() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showEmail, setShowEmail] = useState(false);
 
   const {
     register,
@@ -154,13 +155,21 @@ export default function RecruiterRegister() {
               )}
             </div>
 
-            <div>
+            <div className="relative">
               <input
-                type="email"
+                type={showEmail ? "text" : "email"}
                 {...register("email")}
                 placeholder="Nhập email"
-                className="w-full border-b py-2 outline-none placeholder-gray-500"
+                className="w-full border-b py-2 outline-none placeholder-gray-500 pr-8"
               />
+              <button
+                type="button"
+                onClick={() => setShowEmail((prev) => !prev)}
+                className="absolute right-0 top-2 text-gray-500 hover:text-gray-700"
+                tabIndex={-1}
+              >
+                {showEmail ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+              </button>
               {errors.email && (
                 <p className="text-red-500 text-xs">{errors.email.message}</p>
               )}
