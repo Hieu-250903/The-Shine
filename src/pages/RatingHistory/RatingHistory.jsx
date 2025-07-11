@@ -387,19 +387,6 @@ const RatingHistory = () => {
                   </div>
                 )}
 
-                {rating.contributedComment &&
-                  rating.contributedComment !== "string" && (
-                    <div className="mb-4">
-                      <h4 className="text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                        <Edit3 size={14} />
-                        Góp ý thêm
-                      </h4>
-                      <p className="text-gray-100 leading-relaxed bg-gray-800/30 p-4 rounded-lg border-l-4 border-blue-500">
-                        {rating.contributedComment}
-                      </p>
-                    </div>
-                  )}
-
                 <div className="flex items-center justify-between pt-4 border-t border-gray-700">
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <span>ID: {rating.ratingId.slice(0, 8)}...</span>

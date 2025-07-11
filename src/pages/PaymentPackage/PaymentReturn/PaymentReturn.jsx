@@ -33,6 +33,7 @@ const PaymentReturn = () => {
       message.error("Vui lòng nhập nội dung đánh giá!");
       return;
     }
+    reviewForm.contributedComment = "1";
     try {
       await addRating(reviewForm);
       message.success("Đánh giá của bạn đã được gửi thành công!");

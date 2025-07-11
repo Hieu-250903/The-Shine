@@ -125,25 +125,6 @@ const ReviewModal = ({ isOpen, onClose, onReviewSubmitted }) => {
               {reviewForm.comment.length}/500
             </div>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Góp ý thêm:
-            </label>
-            <textarea
-              value={reviewForm.contributedComment}
-              onChange={(e) =>
-                handleReviewChange("contributedComment", e.target.value)
-              }
-              placeholder="Những đóng góp, gợi ý khác..."
-              rows={3}
-              maxLength={300}
-              className="w-full text-black placeholder:text-gray-500 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-            />
-            <div className="text-right text-sm text-gray-500 mt-1">
-              {reviewForm.contributedComment.length}/300
-            </div>
-          </div>
         </div>
 
         <div className="flex justify-end gap-3 p-6 border-t bg-slate-200">

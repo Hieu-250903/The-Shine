@@ -469,17 +469,6 @@ const RatingList = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">
-                      Góp ý thêm
-                    </label>
-                    <div className="bg-gray-800/50 p-4 rounded-lg">
-                      <p className="text-gray-200">
-                        {selectedRating.contributedComment || "Không có góp ý"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
                     <label className="block text-sm font-medium text-gray-400 mb-1">
                       Thời gian tạo
                     </label>

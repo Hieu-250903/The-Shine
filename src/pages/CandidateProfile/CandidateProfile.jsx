@@ -229,7 +229,7 @@ const CandidateProfile = () => {
       await addRating({
         rating1: reviewForm.rating1,
         comment: reviewForm.comment,
-        contributedComment: reviewForm.contributedComment,
+        contributedComment: "2",
       });
       message.success("Đánh giá của bạn đã được gửi thành công!");
       setShowModalRating(false);
