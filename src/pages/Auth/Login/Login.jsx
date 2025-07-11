@@ -1,4 +1,4 @@
-import { CloseOutlined, GoogleOutlined } from "@ant-design/icons";
+import { CloseOutlined, GoogleOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, message } from "antd";
 import Cookie from "js-cookie";
 import { useState } from "react";
@@ -21,6 +21,7 @@ const LoginScreen = () => {
     rememberMe: false,
   });
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
@@ -127,15 +128,21 @@ const LoginScreen = () => {
                           )}
                         </div>
 
-                        <div className="mb-6">
+                        <div className="mb-6 relative">
                           <input
                             name="password"
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             placeholder="Mật khẩu"
-                            className="w-full p-2 mb-2 bg-transparent border-b border-gray-400 text-white outline-none"
+                            className="w-full p-2 mb-2 bg-transparent border-b border-gray-400 text-white outline-none pr-10"
                             value={formData.password}
                             onChange={handleChange}
                           />
+                          <span
+                            className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer text-xl text-gray-300 hover:text-white"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                          >
+                            {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                          </span>
                           {errors.password && (
                             <p className="text-red-500 text-sm">
                               {errors.password}
