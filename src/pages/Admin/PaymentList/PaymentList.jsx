@@ -67,7 +67,7 @@ const PaymentList = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "COMPLETED":
+      case "PAID":
         return "bg-green-900 text-green-300 border-green-700";
       case "PENDING":
         return "bg-yellow-900 text-yellow-300 border-yellow-700";
@@ -128,11 +128,11 @@ const PaymentList = () => {
   // Calculate statistics
   const stats = {
     total: filteredPayments.length,
-    completed: filteredPayments.filter((p) => p.status === "COMPLETED").length,
+    completed: filteredPayments.filter((p) => p.status === "PAID").length,
     pending: filteredPayments.filter((p) => p.status === "PENDING").length,
     failed: filteredPayments.filter((p) => p.status === "FAILED").length,
     totalAmount: filteredPayments
-      .filter((p) => p.status === "COMPLETED")
+      .filter((p) => p.status === "PAID")
       .reduce((sum, p) => sum + p.amount, 0),
   };
 
@@ -183,7 +183,7 @@ const PaymentList = () => {
                     <option value="all">Tất cả trạng thái</option>
                     <option value="PAID">Hoàn thành</option>
                     <option value="PENDING">Đang xử lý</option>
-                    <option value="CANCEL">Đã hủy</option>
+                    <option value="CANCELLED">Đã hủy</option>
                   </select>
                 </div>
               </div>

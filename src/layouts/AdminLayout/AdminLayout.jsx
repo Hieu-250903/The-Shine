@@ -12,7 +12,7 @@ import {
   BellOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { StarIcon } from "lucide-react";
+import { ArrowDownToDotIcon, AxeIcon, BugIcon, GemIcon, GpuIcon, StarIcon } from "lucide-react";
 import Cookie from "js-cookie";
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -41,6 +41,12 @@ const AdminLayout = () => {
       icon: <StarIcon />,
       label: "Quản lý đánh giá",
       path: "/admin/rating",
+    },
+    {
+      key: "rating",
+      icon: <GemIcon />,
+      label: "Tạo nhà tuyển dụng",
+      path: "/register-recruiter",
     },
     
   ];
