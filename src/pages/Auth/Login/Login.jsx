@@ -1,4 +1,4 @@
-import { CloseOutlined, GoogleOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
+import { CloseOutlined, GoogleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, message } from "antd";
 import Cookie from "js-cookie";
 import { useState } from "react";
@@ -21,8 +21,6 @@ const LoginScreen = () => {
     rememberMe: false,
   });
   const [errors, setErrors] = useState({});
-  // Đã bỏ show/hide email
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
@@ -129,23 +127,15 @@ const LoginScreen = () => {
                           )}
                         </div>
 
-                        <div className="mb-6 relative">
+                        <div className="mb-6">
                           <input
                             name="password"
-                            type={showPassword ? "text" : "password"}
+                            type="password"
                             placeholder="Mật khẩu"
-                            className="w-full p-2 mb-2 bg-transparent border-b border-gray-400 text-white outline-none pr-8"
+                            className="w-full p-2 mb-2 bg-transparent border-b border-gray-400 text-white outline-none"
                             value={formData.password}
                             onChange={handleChange}
                           />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword((prev) => !prev)}
-                            className="absolute right-2 top-2 text-gray-400 hover:text-white"
-                            tabIndex={-1}
-                          >
-                            {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-                          </button>
                           {errors.password && (
                             <p className="text-red-500 text-sm">
                               {errors.password}
@@ -174,20 +164,6 @@ const LoginScreen = () => {
                           onClick={handleSubmit}
                         >
                           ĐĂNG NHẬP
-                        </Button>
-
-                        <div className="flex items-center justify-center my-4">
-                          <div className="flex-1 h-px bg-gray-400"></div>
-                          <p className="mx-4 text-gray-400">HOẶC</p>
-                          <div className="flex-1 h-px bg-gray-400"></div>
-                        </div>
-
-                        <Button
-                          className="w-full py-2 h-10 bg-white text-black font-medium rounded-sm border-none flex items-center justify-center"
-                          onClick={handleGoogleLogin}
-                          icon={<GoogleOutlined />}
-                        >
-                          <span className="ml-2">GOOGLE</span>
                         </Button>
                       </div>
                     </div>

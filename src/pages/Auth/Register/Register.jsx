@@ -231,16 +231,6 @@ export default function Register() {
             {errors.agree && (
               <p className="text-red-500 text-xs">{errors.agree.message}</p>
             )}
-
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-2 border py-2 rounded hover:bg-gray-100 cursor-pointer"
-              onClick={() => console.log("Đăng nhập bằng Google")}
-            >
-              <GoogleOutlined />
-              Đăng nhập bằng Google
-            </button>
-
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-[#8B0000] to-[#D2691E] text-white py-2 rounded hover:opacity-90 cursor-pointer"

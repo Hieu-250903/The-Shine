@@ -227,7 +227,7 @@ const CandidateProfile = () => {
     }
     try {
       await addRating({
-        rating2: reviewForm.rating1,
+        rating1: reviewForm.rating1,
         comment: reviewForm.comment,
         contributedComment: reviewForm.contributedComment,
       });

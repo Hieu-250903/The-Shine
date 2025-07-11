@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getPaymentApi } from "../../../services/payment";
+import { getPaymentApi, getTotalPayment } from "../../../services/payment";
 import {
   DollarOutlined,
   CheckCircleOutlined,
@@ -13,15 +13,17 @@ import RatingPieCharts from "../../../components/Charts/PieChart";
 const Dashboard = () => {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [totalPaymnt, setTotalPayment] = useState(0);
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const res = await getPaymentApi();
+        const resTotal = await getTotalPayment();
+
         if (res) setPayments(res);
+        if (resTotal) setTotalPayment(resTotal);
       } catch (e) {
-        // handle error
       } finally {
         setLoading(false);
       }
@@ -33,39 +35,56 @@ const Dashboard = () => {
   const completed = payments.filter((p) => p.status === "COMPLETED");
   const pending = payments.filter((p) => p.status === "PENDING");
   const failed = payments.filter((p) => p.status === "FAILED");
-  const totalRevenue = completed.reduce((sum, p) => sum + (p.amount || 0), 0);
 
   const formatCurrency = (amount) =>
-    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
+    new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
   const formatDate = (date) =>
-    date ? new Date(date).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit", year: "numeric" }) : "-";
+    date
+      ? new Date(date).toLocaleString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
+      : "-";
 
   return (
     <div className="p-6 bg-gray-900 min-h-screen">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold text-white mb-6 flex items-center gap-3">
-          <DollarOutlined className="text-blue-400" /> Dashboard Doanh thu ứng viên
+          <DollarOutlined className="text-blue-400" /> Dashboard Doanh thu ứng
+          viên
         </h1>
         {/* Thống kê tổng quan */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Tổng doanh thu</p>
-              <p className="text-2xl font-bold text-green-400">{formatCurrency(totalRevenue)}</p>
+              <p className="text-2xl font-bold text-green-400">
+                {formatCurrency(totalPaymnt)}
+              </p>
             </div>
             <DollarOutlined className="text-2xl text-green-400" />
           </div>
           <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Hoàn thành</p>
-              <p className="text-2xl font-bold text-green-400">{completed.length}</p>
+              <p className="text-2xl font-bold text-green-400">
+                {completed.length}
+              </p>
             </div>
             <CheckCircleOutlined className="text-2xl text-green-400" />
           </div>
           <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Đang xử lý</p>
-              <p className="text-2xl font-bold text-yellow-400">{pending.length}</p>
+              <p className="text-2xl font-bold text-yellow-400">
+                {pending.length}
+              </p>
             </div>
             <ClockCircleOutlined className="text-2xl text-yellow-400" />
           </div>
@@ -99,22 +118,35 @@ const Dashboard = () => {
                 </thead>
                 <tbody>
                   {payments.slice(0, 10).map((p) => (
-                    <tr key={p.paymentId} className="border-b border-gray-700 hover:bg-gray-700/50">
+                    <tr
+                      key={p.paymentId}
+                      className="border-b border-gray-700 hover:bg-gray-700/50"
+                    >
                       <td className="p-3 font-mono">{p.transactionId}</td>
-                      <td className="p-3 text-green-400">{formatCurrency(p.amount)}</td>
+                      <td className="p-3 text-green-400">
+                        {formatCurrency(p.amount)}
+                      </td>
                       <td className="p-3">{formatDate(p.paidAt)}</td>
                       <td className="p-3">
                         {p.status === "COMPLETED" && (
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-900 text-green-300 border border-green-700">Hoàn thành</span>
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-900 text-green-300 border border-green-700">
+                            Hoàn thành
+                          </span>
                         )}
                         {p.status === "PENDING" && (
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-900 text-yellow-300 border border-yellow-700">Đang xử lý</span>
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-900 text-yellow-300 border border-yellow-700">
+                            Đang xử lý
+                          </span>
                         )}
                         {p.status === "FAILED" && (
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-900 text-red-300 border border-red-700">Thất bại</span>
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-900 text-red-300 border border-red-700">
+                            Thất bại
+                          </span>
                         )}
                         {p.status === "CANCELLED" && (
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-700 text-gray-300 border border-gray-600">Đã hủy</span>
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-700 text-gray-300 border border-gray-600">
+                            Đã hủy
+                          </span>
                         )}
                       </td>
                     </tr>

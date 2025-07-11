@@ -38,7 +38,6 @@ export default function RecruiterRegister() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showEmail, setShowEmail] = useState(false);
 
   const {
     register,
@@ -155,21 +154,13 @@ export default function RecruiterRegister() {
               )}
             </div>
 
-            <div className="relative">
+            <div>
               <input
-                type={showEmail ? "text" : "email"}
+                type="email"
                 {...register("email")}
                 placeholder="Nhập email"
-                className="w-full border-b py-2 outline-none placeholder-gray-500 pr-8"
+                className="w-full border-b py-2 outline-none placeholder-gray-500"
               />
-              <button
-                type="button"
-                onClick={() => setShowEmail((prev) => !prev)}
-                className="absolute right-0 top-2 text-gray-500 hover:text-gray-700"
-                tabIndex={-1}
-              >
-                {showEmail ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-              </button>
               {errors.email && (
                 <p className="text-red-500 text-xs">{errors.email.message}</p>
               )}
@@ -295,16 +286,6 @@ export default function RecruiterRegister() {
             {errors.agree && (
               <p className="text-red-500 text-xs">{errors.agree.message}</p>
             )}
-
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-2 border py-2 rounded hover:bg-gray-100 cursor-pointer"
-              onClick={() => console.log("Đăng nhập bằng Google")}
-            >
-              <GoogleOutlined />
-              Đăng nhập bằng Google
-            </button>
-
             <button
               type="submit"
               className="w-full bg-gradient-to-r from-[#8B0000] to-[#D2691E] text-white py-2 rounded hover:opacity-90 cursor-pointer"

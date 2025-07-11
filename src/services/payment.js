@@ -12,4 +12,13 @@ const getPaymentApi = async () => {
 const getPaymentChartDataApi = async (chartData) => {
   return await instance.post("/Payment/paymentChartData", chartData);
 };
-export { createPaymentApi, getPaymentApi, getPaymentOrderCodeApi, getPaymentChartDataApi };
+const getTotalPayment = async () => {
+  return await instance.get("/Payment/total");
+};
+export {
+  createPaymentApi,
+  getPaymentApi,
+  getPaymentOrderCodeApi,
+  getPaymentChartDataApi,
+  getTotalPayment,
+};
