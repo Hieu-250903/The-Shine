@@ -128,11 +128,11 @@ const PaymentList = () => {
   // Calculate statistics
   const stats = {
     total: filteredPayments.length,
-    completed: filteredPayments.filter((p) => p.status === "COMPLETED").length,
+    completed: filteredPayments.filter((p) => p.status === "PAID").length,
     pending: filteredPayments.filter((p) => p.status === "PENDING").length,
     failed: filteredPayments.filter((p) => p.status === "FAILED").length,
     totalAmount: filteredPayments
-      .filter((p) => p.status === "COMPLETED")
+      .filter((p) => p.status === "PAID")
       .reduce((sum, p) => sum + p.amount, 0),
   };
 
@@ -248,10 +248,9 @@ const PaymentList = () => {
                     onChange={(e) => setStatusFilter(e.target.value)}
                   >
                     <option value="all">Tất cả trạng thái</option>
-                    <option value="COMPLETED">Hoàn thành</option>
+                    <option value="PAID">Hoàn thành</option>
                     <option value="PENDING">Đang xử lý</option>
-                    <option value="FAILED">Thất bại</option>
-                    {/* <option value="CANCELLED">Đã hủy</option> */}
+                    <option value="CANCELLED">Đã hủy</option>
                   </select>
                 </div>
               </div>
