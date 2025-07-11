@@ -30,12 +30,12 @@ const AdminLayout = () => {
     //   label: "Quản lý người dùng",
     //   path: "/admin/users",
     // },
-    {
-      key: "payments",
-      icon: <CreditCardOutlined />,
-      label: "Quản lý thanh toán",
-      path: "/admin/payment",
-    },
+    // {
+    //   key: "payments",
+    //   icon: <CreditCardOutlined />,
+    //   label: "Quản lý thanh toán",
+    //   path: "/admin/payment",
+    // },
     {
       key: "rating",
       icon: <StarIcon />,
@@ -118,20 +118,7 @@ const AdminLayout = () => {
         </nav>
 
         <div className="p-3 border-t border-gray-700">
-          <button
-            className={`w-full flex items-center px-3 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200 group relative`}
-          >
-            <span className={`text-lg ${collapsed ? "mx-auto" : "mr-3"}`}>
-              <SettingOutlined />
-            </span>
-            {!collapsed && <span className="font-medium">Cài đặt</span>}
-
-            {collapsed && (
-              <div className="absolute left-16 ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
-                Cài đặt
-              </div>
-            )}
-          </button>
+          
 
           <button
             onClick={handleLogout}

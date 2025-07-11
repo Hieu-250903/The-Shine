@@ -21,26 +21,8 @@ const PaymentReturn = () => {
     buttonBgColor: isCancel ? "red" : "green",
     buttonTextColor: "white",
   };
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  useEffect(() => {
-    const isAuthen = localStorage.getItem("isAuthen");
-
-    const handleCheckRating = async () => {
-      try {
-        const res = await checkRating1();
-        const hasRated = res || false;
-        if (isAuthen && !hasRated) {
-          setIsReviewModalOpen(true);
-        }
-      } catch (error) {
-        console.error("Error checking rating:", error);
-      }
-    };
-
-    if (isAuthen) {
-      handleCheckRating();
-    }
-  }, []);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(true);
+ 
   const handleReviewSubmitted = async (reviewForm) => {
     console.log("reviewForm", reviewForm);
     if (reviewForm.rating1 === 0) {

@@ -491,7 +491,7 @@ const CandidateProfile = () => {
             </div>
           </div>
         </div>
-        {!checkAtr && (
+        
           <div className="absolute top-10 right-10">
             <button
               onClick={() => {
@@ -502,7 +502,7 @@ const CandidateProfile = () => {
               Đánh giá chức năng
             </button>
           </div>
-        )}
+        
         {showModalRating && (
           <ReviewModal
             isOpen={showModalRating}
