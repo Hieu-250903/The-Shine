@@ -124,7 +124,7 @@ const Navbar = () => {
             <Link to="/login" className="hover:text-gray-400">
               ĐĂNG NHẬP
             </Link>
-            <Link to="/role-selection" className="hover:text-gray-400">
+            <Link to="/register" className="hover:text-gray-400">
               ĐĂNG KÝ
             </Link>
           </>

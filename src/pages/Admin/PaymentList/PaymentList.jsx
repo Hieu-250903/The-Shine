@@ -251,7 +251,7 @@ const PaymentList = () => {
                     <option value="COMPLETED">Hoàn thành</option>
                     <option value="PENDING">Đang xử lý</option>
                     <option value="FAILED">Thất bại</option>
-                    <option value="CANCELLED">Đã hủy</option>
+                    {/* <option value="CANCELLED">Đã hủy</option> */}
                   </select>
                 </div>
               </div>

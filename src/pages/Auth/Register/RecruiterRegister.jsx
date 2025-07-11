@@ -109,7 +109,7 @@ export default function RecruiterRegister() {
   return (
     <div className="relative">
       <Link
-        to="/"
+        to="/admin/dashboard"
         className="text-sm text-gray-600 mb-4 inline-block hover:underline absolute top-4 left-6 z-10"
       >
         &larr; Quay lại
