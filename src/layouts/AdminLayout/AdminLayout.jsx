@@ -42,12 +42,7 @@ const AdminLayout = () => {
       label: "Quản lý đánh giá",
       path: "/admin/rating",
     },
-    {
-      key: "applications",
-      icon: <UserOutlined />,
-      label: "Quản lý ứng viên",
-      path: "/admin/applications",
-    },
+    
   ];
 
   const handleMenuClick = (path) => {
@@ -184,12 +179,12 @@ const AdminLayout = () => {
                 />
               </div>
 
-              <button className="relative p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
+              {/* <button className="relative p-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors">
                 <BellOutlined className="text-lg" />
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
                   3
                 </span>
-              </button>
+              </button> */}
 
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
@@ -199,7 +194,7 @@ const AdminLayout = () => {
                   <div className="text-sm font-medium text-white">
                     Admin User
                   </div>
-                  <div className="text-xs text-gray-400">admin@example.com</div>
+                  <div className="text-xs text-gray-400">admin@gmail.com</div>
                 </div>
               </div>
             </div>

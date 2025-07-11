@@ -79,7 +79,7 @@ const Navbar = () => {
     <nav className="bg-[#161616] text-white p-6 flex items-center justify-between">
       <div className="flex items-center gap-8 text-sm font-semibold uppercase">
         <Link to="/about" className="hover:text-gray-400">
-          THE SHINE
+          Giới thiệu
         </Link>
         {role === "recruiter" ? (
           <>
