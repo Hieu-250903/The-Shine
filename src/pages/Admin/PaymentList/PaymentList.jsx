@@ -248,10 +248,9 @@ const PaymentList = () => {
                     onChange={(e) => setStatusFilter(e.target.value)}
                   >
                     <option value="all">Tất cả trạng thái</option>
-                    <option value="COMPLETED">Hoàn thành</option>
+                    <option value="PAID">Hoàn thành</option>
                     <option value="PENDING">Đang xử lý</option>
-                    <option value="FAILED">Thất bại</option>
-                    <option value="CANCELLED">Đã hủy</option>
+                    <option value="CANCEL">Đã hủy</option>
                   </select>
                 </div>
               </div>

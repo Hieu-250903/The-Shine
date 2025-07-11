@@ -30,12 +30,12 @@ const AdminLayout = () => {
     //   label: "Quản lý người dùng",
     //   path: "/admin/users",
     // },
-    // {
-    //   key: "payments",
-    //   icon: <CreditCardOutlined />,
-    //   label: "Quản lý thanh toán",
-    //   path: "/admin/payment",
-    // },
+    {
+      key: "payments",
+      icon: <CreditCardOutlined />,
+      label: "Quản lý thanh toán",
+      path: "/admin/payment",
+    },
     {
       key: "rating",
       icon: <StarIcon />,
