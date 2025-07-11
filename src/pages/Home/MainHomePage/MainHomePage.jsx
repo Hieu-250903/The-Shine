@@ -46,6 +46,9 @@ const MainHomePage = () => {
             VÀ NHÀ TUYỂN DỤNG KẾT NỐI VỚI NHAU
           </p>
         </div>
+        <div className="absolute right-[6%] bottom-[12%] cursor-pointer">
+          <CommentOutlined size={60} className="text-6xl" />
+        </div>
       </section>
 
       {/* Features Section */}
