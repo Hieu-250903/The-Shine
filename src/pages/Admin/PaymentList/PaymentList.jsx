@@ -67,7 +67,7 @@ const PaymentList = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "COMPLETED":
+      case "PAID":
         return "bg-green-900 text-green-300 border-green-700";
       case "PENDING":
         return "bg-yellow-900 text-yellow-300 border-yellow-700";
