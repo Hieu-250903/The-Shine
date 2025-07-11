@@ -140,25 +140,92 @@ const PaymentList = () => {
     <div className="p-6 bg-gray-900 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-            <div className="flex items-center gap-3">
-              <CreditCardOutlined className="text-2xl text-blue-400 mr-2" />
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">Quản lý thanh toán</h1>
-                <p className="text-gray-300 text-sm md:text-base">Theo dõi và quản lý tất cả các giao dịch thanh toán trong hệ thống</p>
-              </div>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">
+                <CreditCardOutlined className="mr-3 text-blue-400" />
+                Quản lý thanh toán
+              </h1>
+              <p className="text-gray-300">
+                Theo dõi và quản lý tất cả các giao dịch thanh toán trong hệ
+                thống
+              </p>
             </div>
-            <button
-              onClick={fetchData}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-md self-start md:self-auto"
-            >
-              <ReloadOutlined />
-              Làm mới
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={fetchData}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+              >
+                <ReloadOutlined />
+                Làm mới
+              </button>
+              <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                <ExportOutlined />
+                Xuất Excel
+              </button>
+            </div>
           </div>
 
           {/* Statistics Cards */}
-          {/* XÓA toàn bộ đoạn grid thống kê này */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Tổng giao dịch</p>
+                  <p className="text-2xl font-bold text-white">{stats.total}</p>
+                </div>
+                <FileTextOutlined className="text-2xl text-blue-400" />
+              </div>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Hoàn thành</p>
+                  <p className="text-2xl font-bold text-green-400">
+                    {stats.completed}
+                  </p>
+                </div>
+                <CheckCircleOutlined className="text-2xl text-green-400" />
+              </div>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Đang xử lý</p>
+                  <p className="text-2xl font-bold text-yellow-400">
+                    {stats.pending}
+                  </p>
+                </div>
+                <ClockCircleOutlined className="text-2xl text-yellow-400" />
+              </div>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Thất bại</p>
+                  <p className="text-2xl font-bold text-red-400">
+                    {stats.failed}
+                  </p>
+                </div>
+                <CloseCircleOutlined className="text-2xl text-red-400" />
+              </div>
+            </div>
+
+            <div className="bg-gray-800 border border-gray-700 p-4 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Tổng doanh thu</p>
+                  <p className="text-lg font-bold text-green-400">
+                    {formatCurrency(stats.totalAmount)}
+                  </p>
+                </div>
+                <DollarOutlined className="text-2xl text-green-400" />
+              </div>
+            </div>
+          </div>
 
           <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-6">
             <div className="flex flex-col lg:flex-row gap-4">
@@ -219,21 +286,31 @@ const PaymentList = () => {
                 <table className="w-full">
                   <thead className="bg-gray-700 border-b border-gray-600">
                     <tr>
-                      <th className="text-left p-4 text-gray-300 font-medium">Mã giao dịch</th>
-                      {/* <th className="text-left p-4 text-gray-300 font-medium">
+                      <th className="text-left p-4 text-gray-300 font-medium">
+                        Mã giao dịch
+                      </th>
+                      <th className="text-left p-4 text-gray-300 font-medium">
                         ID Ứng dụng
-                      </th> */}
-                      <th className="text-center p-4 text-gray-300 font-medium">Số tiền</th>
-                      <th className="text-center p-4 text-gray-300 font-medium">Trạng thái</th>
-                      <th className="text-center p-4 text-gray-300 font-medium">Thời gian</th>
-                      {/* Xóa cột Hành động */}
+                      </th>
+                      <th className="text-left p-4 text-gray-300 font-medium">
+                        Số tiền
+                      </th>
+                      <th className="text-left p-4 text-gray-300 font-medium">
+                        Trạng thái
+                      </th>
+                      <th className="text-left p-4 text-gray-300 font-medium">
+                        Thời gian
+                      </th>
+                      <th className="text-left p-4 text-gray-300 font-medium">
+                        Hành động
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredPayments.map((payment, idx) => (
+                    {filteredPayments.map((payment) => (
                       <tr
                         key={payment.paymentId}
-                        className={`border-b border-gray-700 hover:bg-gray-750 transition-colors ${idx === filteredPayments.length - 1 ? 'last:rounded-b-xl' : ''}`}
+                        className="border-b border-gray-700 hover:bg-gray-750 transition-colors"
                       >
                         <td className="p-4">
                           <div>
@@ -245,25 +322,43 @@ const PaymentList = () => {
                             </p>
                           </div>
                         </td>
-                        <td className="p-4 text-center align-middle">
-                          <span className="text-gray-200 font-semibold">
-                            {payment.applicationId || <span className="text-gray-400">N/A</span>}
+                        <td className="p-4">
+                          <span className="text-gray-300">
+                            {payment.applicationId || "N/A"}
                           </span>
                         </td>
-                        <td className="p-4 text-center align-middle">
-                          <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(payment.status)}`}
-                            style={{minWidth: '110px'}}>
+                        <td className="p-4">
+                          <span className="text-green-400 font-semibold">
+                            {formatCurrency(payment.amount)}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <span
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                              payment.status
+                            )}`}
+                          >
                             {getStatusIcon(payment.status)}
-                            <span className="ml-1">{getStatusText(payment.status)}</span>
+                            <span className="ml-1">
+                              {getStatusText(payment.status)}
+                            </span>
                           </span>
                         </td>
-                        <td className="p-4 text-center align-middle">
-                          <div className="flex items-center justify-center text-gray-400 text-sm gap-1">
-                            <CalendarOutlined />
-                            <span>{formatDate(payment.paidAt)}</span>
+                        <td className="p-4">
+                          <div className="flex items-center text-gray-400 text-sm">
+                            <CalendarOutlined className="mr-1" />
+                            {formatDate(payment.paidAt)}
                           </div>
                         </td>
-                        {/* Xóa nút Chi tiết */}
+                        <td className="p-4">
+                          <button
+                            onClick={() => setSelectedPayment(payment)}
+                            className="text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
+                          >
+                            <EyeOutlined />
+                            Chi tiết
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -318,14 +413,95 @@ const PaymentList = () => {
                       </span>
                     </div>
                   </div>
-                  {/* Xóa nút Xem chi tiết */}
+
+                  <button
+                    onClick={() => setSelectedPayment(payment)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <EyeOutlined />
+                    Xem chi tiết
+                  </button>
                 </div>
               ))}
             </div>
           </>
         )}
 
-        {/* Xóa toàn bộ phần selectedPayment và modal chi tiết */}
+        {selectedPayment && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-800 border border-gray-700 rounded-xl max-w-lg w-full p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-white">
+                  Chi tiết giao dịch
+                </h3>
+                <button
+                  onClick={() => setSelectedPayment(null)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">ID Thanh toán:</span>
+                  <span className="text-white font-mono text-sm">
+                    {selectedPayment.paymentId}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Mã giao dịch:</span>
+                  <span className="text-white font-mono">
+                    {selectedPayment.transactionId}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">ID Ứng dụng:</span>
+                  <span className="text-white">
+                    {selectedPayment.applicationId || "Không có"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Số tiền:</span>
+                  <span className="text-green-400 font-semibold text-lg">
+                    {formatCurrency(selectedPayment.amount)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Trạng thái:</span>
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                      selectedPayment.status
+                    )}`}
+                  >
+                    {getStatusIcon(selectedPayment.status)}
+                    <span className="ml-1">
+                      {getStatusText(selectedPayment.status)}
+                    </span>
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Thời gian thanh toán:</span>
+                  <span className="text-white">
+                    {formatDate(selectedPayment.paidAt)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => setSelectedPayment(null)}
+                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg transition-colors"
+                >
+                  Đóng
+                </button>
+                <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">
+                  In hóa đơn
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
