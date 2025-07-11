@@ -375,7 +375,11 @@ const RatingList = () => {
                       className="text-sm text-gray-400 truncate"
                       title={rating.contributedComment}
                     >
-                      {rating.contributedComment || "Không có góp ý"}
+                      {rating.contributedComment === "1"
+                        ? "Web"
+                        : rating.contributedComment === "2"
+                        ? "Chức năng"
+                        : rating.contributedComment || "Không có góp ý"}
                     </p>
                   </div>
 
