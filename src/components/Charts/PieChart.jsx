@@ -95,7 +95,7 @@ const RatingPieCharts = () => {
         <div className="flex flex-col md:flex-row gap-8">
           <div className="flex-1 bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-medium mb-4 text-center">
-              Biểu đồ đánh giá 1
+              Biểu đồ đánh giá website
             </h3>
             {loading ? (
               <div className="flex items-center justify-center h-64">
@@ -112,7 +112,7 @@ const RatingPieCharts = () => {
           </div>
           <div className="flex-1 bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 className="text-lg font-medium mb-4 text-center">
-              Biểu đồ đánh giá 2
+              Biểu đồ đánh giá chức năng
             </h3>
             {loading ? (
               <div className="flex items-center justify-center h-64">
