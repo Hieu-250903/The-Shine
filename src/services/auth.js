@@ -27,6 +27,15 @@ const resetPasswordApi = async ({ email, token, newPassword }) => {
     newPassword,
   });
 };
+const getUserInfoApi = async () => {
+  try {
+    const response = await instance.get("/api/User/user-info");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    throw error;
+  }
+};
 export {
   registerApi,
   loginApi,
@@ -35,4 +44,5 @@ export {
   forgotPasswordApi,
   resetPasswordApi,
   registerRecruiterApi,
+  getUserInfoApi,
 };

@@ -48,7 +48,7 @@ const UserHomePage = () => {
           </div>
 
           <div className="w-20 h-1 bg-white my-6" />
-
+{/* 
           <Button
             onClick={() => navigate("/candidate-create-profile")}
             type="primary"
@@ -57,7 +57,7 @@ const UserHomePage = () => {
           >
             <span className="text-lg">TẠO HỒ SƠ NGAY</span>
             <ArrowRightOutlined className="ml-2" />
-          </Button>
+          </Button> */}
         </div>
       </section>
       <section className="relative h-screen w-full overflow-hidden">

@@ -18,6 +18,10 @@ import {
 import { getApplicanJob } from "../../services/application";
 import { useNavigate, useParams } from "react-router-dom";
 
+import {
+  downloadFile,
+  getFileById,
+} from "../../services/file";
 const RecruiterJobApplican = () => {
   const [listApplican, setListApplican] = useState([]);
   const [filteredApplicants, setFilteredApplicants] = useState([]);
@@ -106,6 +110,34 @@ const RecruiterJobApplican = () => {
       minute: "2-digit",
     });
   };
+  const downloadCV = async (fileId, fileName) => {
+  if (!fileId) {
+    message.error("Không có file để tải xuống");
+    return;
+  }
+  if (!fileName) {
+    fileName = "CV.pdf"; // Default file name if not provided
+  }
+
+  try {
+    const response = await downloadFile(fileId);
+    if (response) {
+      const blob = new Blob([response], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      message.success("Tải xuống thành công!");
+    }
+  } catch (error) {
+    console.error("Download error:", error);
+    message.error("Tải xuống thất bại. Vui lòng thử lại!");
+  }
+};
 
   if (loading) {
     return (
@@ -284,6 +316,34 @@ const RecruiterJobApplican = () => {
                       <p className="text-white">
                         {application.interviewType || "Chưa xác định"}
                       </p>
+                    </div>
+                    <div className="bg-gray-750 rounded-lg p-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Calendar className="w-4 h-4 text-purple-400" />
+                        <span className="text-sm font-medium text-gray-300">
+                          Thông tin liên hệ
+                        </span>
+                      </div>
+                      <p className="text-white">
+                        {application.candidate?.user?.phone || "Liên hệ với admin để liên hệ với ứng viên này"}
+                      </p>
+                    </div>
+                    <div className="bg-gray-750 rounded-lg p-4">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Calendar className="w-4 h-4 text-purple-400" />
+                        <span className="text-sm font-medium text-gray-300">
+                          Tải cv ứng viên
+                        </span></div>
+                      {application.candidate?.user?.cvFileId ? (
+                        <button
+                          onClick={() => downloadCV(application.candidate?.user?.cvFileId, `${application.candidate?.user?.name || "CV"}.pdf`)}
+                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                        >
+                          Tải xuống
+                        </button>
+                      ) : (
+                        <p className="text-white text-sm">No CV for this candidate</p>
+                      )}
                     </div>
                   </div>
 

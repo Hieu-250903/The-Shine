@@ -3,6 +3,7 @@ import Cookie from "js-cookie";
 
 const instance = axios.create({
   baseURL: "https://api.nhannguyen.site/api",
+  // baseURL: "https://localhost:7131/api",
 });
 
 instance.interceptors.request.use(
