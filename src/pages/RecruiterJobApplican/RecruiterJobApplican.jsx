@@ -18,10 +18,7 @@ import {
 import { getApplicanJob } from "../../services/application";
 import { useNavigate, useParams } from "react-router-dom";
 
-import {
-  downloadFile,
-  getFileById,
-} from "../../services/file";
+import { downloadFile, getFileById } from "../../services/file";
 const RecruiterJobApplican = () => {
   const [listApplican, setListApplican] = useState([]);
   const [filteredApplicants, setFilteredApplicants] = useState([]);
@@ -110,34 +107,41 @@ const RecruiterJobApplican = () => {
       minute: "2-digit",
     });
   };
-  const downloadCV = async (fileId, fileName) => {
-  if (!fileId) {
-    message.error("Không có file để tải xuống");
-    return;
-  }
-  if (!fileName) {
-    fileName = "CV.pdf"; // Default file name if not provided
-  }
-
-  try {
-    const response = await downloadFile(fileId);
-    if (response) {
-      const blob = new Blob([response], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      message.success("Tải xuống thành công!");
+  const viewUploadedFile = (fileId) => {
+    if (!fileId) {
+      message.error("Không có thông tin file để xem");
+      return;
     }
-  } catch (error) {
-    console.error("Download error:", error);
-    message.error("Tải xuống thất bại. Vui lòng thử lại!");
-  }
-};
+    navigate(`/cv/${fileId}`);
+  };
+  const downloadCV = async (fileId, fileName) => {
+    if (!fileId) {
+      message.error("Không có file để tải xuống");
+      return;
+    }
+    if (!fileName) {
+      fileName = "CV.pdf"; // Default file name if not provided
+    }
+
+    try {
+      const response = await downloadFile(fileId);
+      if (response) {
+        const blob = new Blob([response], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        message.success("Tải xuống thành công!");
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      message.error("Tải xuống thất bại. Vui lòng thử lại!");
+    }
+  };
 
   if (loading) {
     return (
@@ -325,7 +329,8 @@ const RecruiterJobApplican = () => {
                         </span>
                       </div>
                       <p className="text-white">
-                        {application.candidate?.user?.phone || "Liên hệ với admin để liên hệ với ứng viên này"}
+                        {application.candidate?.user?.phone ||
+                          "Liên hệ với admin để liên hệ với ứng viên này"}
                       </p>
                     </div>
                     <div className="bg-gray-750 rounded-lg p-4">
@@ -333,16 +338,38 @@ const RecruiterJobApplican = () => {
                         <Calendar className="w-4 h-4 text-purple-400" />
                         <span className="text-sm font-medium text-gray-300">
                           Tải cv ứng viên
-                        </span></div>
+                        </span>
+                      </div>
                       {application.candidate?.user?.cvFileId ? (
-                        <button
-                          onClick={() => downloadCV(application.candidate?.user?.cvFileId, `${application.candidate?.user?.name || "CV"}.pdf`)}
-                          className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
-                        >
-                          Tải xuống
-                        </button>
+                        <div>
+                          <button
+                            onClick={() =>
+                              downloadCV(
+                                application.candidate?.user?.cvFileId,
+                                `${
+                                  application.candidate?.user?.name || "CV"
+                                }.pdf`
+                              )
+                            }
+                            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                          >
+                            Tải xuống
+                          </button>
+                          <button
+                            onClick={() =>
+                              viewUploadedFile(
+                                application.candidate?.user?.cvFileId
+                              )
+                            }
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                          >
+                            Xem PDF
+                          </button>
+                        </div>
                       ) : (
-                        <p className="text-white text-sm">No CV for this candidate</p>
+                        <p className="text-white text-sm">
+                          No CV for this candidate
+                        </p>
                       )}
                     </div>
                   </div>
@@ -379,22 +406,12 @@ const RecruiterJobApplican = () => {
                     )}
 
                   <div className="space-y-4">
-                    {application.about && (
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-300 mb-2">
-                          Giới thiệu về công việc
-                        </h4>
-                        <p className="text-gray-300 bg-gray-750 rounded-lg p-4">
-                          {application.about}
-                        </p>
-                      </div>
-                    )}
                     {application.aboutMe && (
                       <div>
                         <h4 className="text-sm font-medium text-gray-300 mb-2">
-                          Giới thiệu bản thân
+                          &nbsp;&nbsp;&nbsp; Giới thiệu bản thân
                         </h4>
-                        <p className="text-gray-300 bg-gray-750 rounded-lg p-4">
+                        <p className="text-gray-300 bg-gray -750 rounded-lg p-4">
                           {application.aboutMe}
                         </p>
                       </div>

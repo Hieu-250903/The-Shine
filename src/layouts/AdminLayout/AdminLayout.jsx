@@ -12,7 +12,14 @@ import {
   BellOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { ArrowDownToDotIcon, AxeIcon, BugIcon, GemIcon, GpuIcon, StarIcon } from "lucide-react";
+import {
+  ArrowDownToDotIcon,
+  AxeIcon,
+  BugIcon,
+  GemIcon,
+  GpuIcon,
+  StarIcon,
+} from "lucide-react";
 import Cookie from "js-cookie";
 const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -42,13 +49,12 @@ const AdminLayout = () => {
       label: "Quản lý đánh giá",
       path: "/admin/rating",
     },
-    {
-      key: "rating",
-      icon: <GemIcon />,
-      label: "Tạo nhà tuyển dụng",
-      path: "/register-recruiter",
-    },
-    
+    // {
+    //   key: "rating",
+    //   icon: <GemIcon />,
+    //   label: "Tạo nhà tuyển dụng",
+    //   path: "/register-recruiter",
+    // },
   ];
 
   const handleMenuClick = (path) => {
@@ -124,8 +130,6 @@ const AdminLayout = () => {
         </nav>
 
         <div className="p-3 border-t border-gray-700">
-          
-
           <button
             onClick={handleLogout}
             className={`w-full flex items-center px-3 py-3 rounded-lg text-gray-300 hover:bg-red-600 hover:text-white transition-all duration-200 group relative mt-1`}
