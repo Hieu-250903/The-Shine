@@ -49,12 +49,12 @@ const AdminLayout = () => {
       label: "Quản lý đánh giá",
       path: "/admin/rating",
     },
-    // {
-    //   key: "rating",
-    //   icon: <GemIcon />,
-    //   label: "Tạo nhà tuyển dụng",
-    //   path: "/register-recruiter",
-    // },
+    {
+      key: "rating",
+      icon: <GemIcon />,
+      label: "Tạo nhà tuyển dụng",
+      path: "/register-recruiter",
+    },
   ];
 
   const handleMenuClick = (path) => {
