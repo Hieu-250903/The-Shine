@@ -66,7 +66,7 @@ const RecruiterHomePage = () => {
             tiếp cận hàng ngàn cơ hội việc làm chỉ trong vài giây. Với quy trình
             đơn giản, minh bạch và linh hoạt.
           </span>
-          <button
+          {/* <button
             onClick={() => navigate("/potential-candidate")}
             className=" flex items-center py-4 px-2  rounded-md bg-gradient-to-r from-[#9D64FE] via-[#3D9ABE] to-[#200189]  text-white font-bold mt-10 cursor-pointer"
           >
@@ -74,7 +74,7 @@ const RecruiterHomePage = () => {
             <div className=" ml-4 mr-4">
               <RightCircleFilled />
             </div>
-          </button>
+          </button> */}
         </div>
       </section>
       <section className="relative min-h-screen w-full overflow-hidden">
@@ -97,12 +97,12 @@ const RecruiterHomePage = () => {
           <span className="line-clamp-6 max-w-96 text-white text-right text-xs tracking-widest">
             Kết nối ứng viên với công việc phù hợp chỉ trong vài phút!
           </span>
-          <button
+          {/* <button
             onClick={() => navigate("/candidate-list")}
             className="py-4 px-2 max-w-3/4 rounded-md bg-slate-200 text-[#3A5388] font-bold mt-10 cursor-pointer"
           >
             TÌM ỨNG VIÊN NGAY
-          </button>
+          </button> */}
         </div>
       </section>
     </div>
